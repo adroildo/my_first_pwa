@@ -317,109 +317,23 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// Lógica de Instalação PWA e Botão Arrastável
+// Lógica de Instalação PWA
 let deferredPrompt;
-const installBtn = document.getElementById('install-banner');
+const installBanner = document.getElementById('install-banner');
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    installBtn.classList.remove('hidden');
+    installBanner.classList.remove('hidden');
 });
 
-// Lógica de Arrastar (Drag) - VERSÃO BLINDADA
-let isDragging = false;
-let currentX = 0;
-let currentY = 0;
-let initialX;
-let initialY;
-let xOffset = 0;
-let yOffset = 0;
-
-// Limites pré-calculados
-let limitMinX, limitMaxX, limitMinY, limitMaxY;
-
-function dragStart(e) {
-    if (e.target === installBtn || installBtn.contains(e.target)) {
-        if (e.type === "touchstart") {
-            initialX = e.touches[0].clientX - xOffset;
-            initialY = e.touches[0].clientY - yOffset;
-        } else {
-            initialX = e.clientX - xOffset;
-            initialY = e.clientY - yOffset;
-        }
-
-        // Calcula os limites UMA VEZ no início do toque
-        const rect = installBtn.getBoundingClientRect();
-        // Posição base sem o transform atual
-        const baseLeft = rect.left - xOffset;
-        const baseTop = rect.top - yOffset;
-
-        limitMinX = -baseLeft + 10;
-        limitMaxX = window.innerWidth - baseLeft - rect.width - 10;
-        limitMinY = -baseTop + 70;
-        limitMaxY = window.innerHeight - baseTop - rect.height - 90;
-
-        isDragging = true;
-    }
-}
-
-function dragEnd(e) {
-    isDragging = false;
-    initialX = currentX;
-    initialY = currentY;
-}
-
-function drag(e) {
-    if (isDragging) {
-        e.preventDefault();
-        
-        let clientX, clientY;
-        if (e.type === "touchmove") {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-        } else {
-            clientX = e.clientX;
-            clientY = e.clientY;
-        }
-
-        let newX = clientX - initialX;
-        let newY = clientY - initialY;
-
-        // CLAMP (Trava Absoluta)
-        currentX = Math.min(Math.max(newX, limitMinX), limitMaxX);
-        currentY = Math.min(Math.max(newY, limitMinY), limitMaxY);
-
-        xOffset = currentX;
-        yOffset = currentY;
-        setTranslate(currentX, currentY, installBtn);
-    }
-}
-
-function setTranslate(xPos, yPos, el) {
-    el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
-}
-
-// Eventos de Mouse e Touch para Arrastar
-document.addEventListener("touchstart", dragStart, false);
-document.addEventListener("touchend", dragEnd, false);
-document.addEventListener("touchmove", drag, { passive: false });
-
-document.addEventListener("mousedown", dragStart, false);
-document.addEventListener("mouseup", dragEnd, false);
-document.addEventListener("mousemove", drag, false);
-
-// Clique para instalar (só dispara se não for um arrasto longo)
-installBtn.addEventListener('click', async (e) => {
-    // Se moveu muito pouco, considera clique
-    if (Math.abs(xOffset) < 5 && Math.abs(yOffset) < 5) {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`Usuário escolheu: ${outcome}`);
-            deferredPrompt = null;
-            installBtn.classList.add('hidden');
-        }
+installBanner.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`Usuário escolheu: ${outcome}`);
+        deferredPrompt = null;
+        installBanner.classList.add('hidden');
     }
 });
 
