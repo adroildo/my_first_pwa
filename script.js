@@ -143,6 +143,7 @@ function handleLogin() {
 
 let verificationTimer;
 let attemptsLeft = 3;
+let isRecoveryMode = false;
 
 function handleSignup() {
     const name = document.getElementById('signup-name').value;
@@ -150,6 +151,7 @@ function handleSignup() {
     const pass = document.getElementById('signup-pass').value;
 
     if (name && email && pass) {
+        isRecoveryMode = false;
         // Simulação de transição para verificação
         toggleAuth('verify');
         startTimer();
@@ -158,10 +160,23 @@ function handleSignup() {
         localStorage.setItem('tempProfile', JSON.stringify({
             name: name,
             username: email.split('@')[0],
-            image: 'https://i.pravatar.cc/300'
+            image: 'https://i.pravatar.cc/300',
+            password: pass
         }));
     } else {
         showAlert('Preencha todos os campos.');
+    }
+}
+
+function handleRecovery() {
+    const email = document.getElementById('recovery-email').value;
+    if (email) {
+        isRecoveryMode = true;
+        toggleAuth('verify');
+        startTimer();
+        showAlert('Código de recuperação enviado!');
+    } else {
+        showAlert('Digite seu e-mail.');
     }
 }
 
@@ -169,12 +184,16 @@ function toggleAuth(mode) {
     const loginForm = document.getElementById('login-form');
     const signupForm = document.getElementById('signup-form');
     const verifyForm = document.getElementById('verify-form');
+    const recoveryForm = document.getElementById('recovery-form');
+    const newPasswordForm = document.getElementById('new-password-form');
     const title = document.getElementById('auth-title');
     const subtitle = document.getElementById('auth-subtitle');
 
     loginForm.classList.add('hidden');
     signupForm.classList.add('hidden');
     verifyForm.classList.add('hidden');
+    recoveryForm.classList.add('hidden');
+    newPasswordForm.classList.add('hidden');
 
     if (mode === 'signup') {
         signupForm.classList.remove('hidden');
@@ -184,6 +203,14 @@ function toggleAuth(mode) {
         verifyForm.classList.remove('hidden');
         title.innerText = 'Verificação';
         subtitle.innerText = 'Digite o código enviado';
+    } else if (mode === 'recovery') {
+        recoveryForm.classList.remove('hidden');
+        title.innerText = 'Recuperação';
+        subtitle.innerText = 'Digite seu e-mail cadastrado';
+    } else if (mode === 'new-password') {
+        newPasswordForm.classList.remove('hidden');
+        title.innerText = 'Nova Senha';
+        subtitle.innerText = 'Escolha sua nova senha forte';
     } else {
         loginForm.classList.remove('hidden');
         title.innerText = 'Bem-vindo';
@@ -219,11 +246,16 @@ function handleVerify() {
 
     if (code.length === 6) {
         if (code === '123456') { // Código de teste
-            const temp = JSON.parse(localStorage.getItem('tempProfile'));
-            localStorage.setItem('userProfile', JSON.stringify(temp));
-            localStorage.setItem('isLoggedIn', 'true');
-            checkAuth();
-            showAlert('Conta verificada com sucesso!', 'fa-circle-check');
+            if (isRecoveryMode) {
+                toggleAuth('new-password');
+                showAlert('Código aceito. Defina sua nova senha.', 'fa-circle-check');
+            } else {
+                const temp = JSON.parse(localStorage.getItem('tempProfile'));
+                localStorage.setItem('userProfile', JSON.stringify(temp));
+                localStorage.setItem('isLoggedIn', 'true');
+                checkAuth();
+                showAlert('Conta verificada com sucesso!', 'fa-circle-check');
+            }
         } else {
             attemptsLeft--;
             document.getElementById('attempts-count').innerText = attemptsLeft;
@@ -247,6 +279,19 @@ function handleVerify() {
 function handleResend() {
     showAlert('Novo código enviado para seu e-mail.');
     startTimer();
+}
+
+function handleUpdatePassword() {
+    const p1 = document.getElementById('new-pass').value;
+    const p2 = document.getElementById('new-pass-confirm').value;
+
+    if (p1 && p1 === p2) {
+        // Simulação de atualização de senha
+        showAlert('Senha alterada com sucesso!', 'fa-circle-check');
+        setTimeout(() => toggleAuth('login'), 2000);
+    } else {
+        showAlert('As senhas não coincidem ou estão vazias.');
+    }
 }
 
 // Auto-focus para inputs de código
