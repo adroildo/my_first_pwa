@@ -300,8 +300,8 @@ async function clearAppCache() {
             }
         }
 
-        // 3. Opcional: Limpar LocalStorage (Descomente se quiser um reset total)
-        // localStorage.clear();
+        // 3. Limpar LocalStorage (Desconectar usuário e resetar perfil)
+        localStorage.clear();
 
         // 4. Recarregar a página
         location.reload(true);
