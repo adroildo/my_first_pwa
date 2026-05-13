@@ -122,17 +122,18 @@
 
 <body>
 
-    <!-- SEÇÃO: AUTENTICAÇÃO (Login) -->
-    <div id="auth-section" class="fixed inset-0 z-[100] bg-white flex flex-col px-8 pt-20 overflow-y-auto">
-        <div class="flex flex-col items-center mb-12">
-            <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white text-4xl shadow-xl shadow-indigo-200 mb-6">
+    <!-- SEÇÃO: AUTENTICAÇÃO (Login/Cadastro) -->
+    <div id="auth-section" class="fixed inset-0 z-[100] bg-white flex flex-col px-8 pt-16 overflow-y-auto">
+        <div class="flex flex-col items-center mb-10">
+            <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white text-3xl shadow-xl shadow-indigo-200 mb-6">
                 <i class="fa-solid fa-rocket"></i>
             </div>
-            <h2 class="text-3xl font-black text-slate-900">Bem-vindo</h2>
-            <p class="text-slate-400 font-medium">Faça login para continuar</p>
+            <h2 id="auth-title" class="text-3xl font-black text-slate-900">Bem-vindo</h2>
+            <p id="auth-subtitle" class="text-slate-400 font-medium">Faça login para continuar</p>
         </div>
 
-        <div class="space-y-4">
+        <!-- Formulário de LOGIN -->
+        <div id="login-form" class="space-y-4">
             <div>
                 <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">E-mail ou Usuário</label>
                 <input type="text" id="login-user" placeholder="seu@email.com" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
@@ -147,7 +148,31 @@
             </button>
             
             <p class="text-center text-xs font-bold text-slate-400 pt-4">
-                Não tem uma conta? <span class="text-indigo-600">Criar Agora</span>
+                Não tem uma conta? <button onclick="toggleAuth('signup')" class="text-indigo-600">Criar Agora</button>
+            </p>
+        </div>
+
+        <!-- Formulário de CADASTRO -->
+        <div id="signup-form" class="space-y-4 hidden">
+            <div>
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Nome Completo</label>
+                <input type="text" id="signup-name" placeholder="Seu Nome" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+            </div>
+            <div>
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">E-mail</label>
+                <input type="email" id="signup-email" placeholder="seu@email.com" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+            </div>
+            <div>
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Senha</label>
+                <input type="password" id="signup-pass" placeholder="••••••••" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+            </div>
+            
+            <button onclick="handleSignup()" class="w-full bg-indigo-600 text-white font-black uppercase py-4 rounded-2xl mt-4 shadow-lg shadow-indigo-100 active:scale-95 transition-transform">
+                Criar Minha Conta
+            </button>
+            
+            <p class="text-center text-xs font-bold text-slate-400 pt-4">
+                Já tem uma conta? <button onclick="toggleAuth('login')" class="text-indigo-600">Fazer Login</button>
             </p>
         </div>
     </div>
@@ -513,6 +538,47 @@
                 console.log('Login realizado!');
             } else {
                 alert('Por favor, preencha todos os campos.');
+            }
+        }
+
+        function handleSignup() {
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const pass = document.getElementById('signup-pass').value;
+
+            if (name && email && pass) {
+                // Simulação de cadastro
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userProfile', JSON.stringify({
+                    name: name,
+                    username: email.split('@')[0],
+                    image: 'https://i.pravatar.cc/300'
+                }));
+                
+                loadProfile();
+                checkAuth();
+                console.log('Conta criada!');
+            } else {
+                alert('Por favor, preencha todos os campos.');
+            }
+        }
+
+        function toggleAuth(mode) {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const title = document.getElementById('auth-title');
+            const subtitle = document.getElementById('auth-subtitle');
+
+            if (mode === 'signup') {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                title.innerText = 'Nova Conta';
+                subtitle.innerText = 'Comece sua jornada premium';
+            } else {
+                loginForm.classList.remove('hidden');
+                signupForm.classList.add('hidden');
+                title.innerText = 'Bem-vindo';
+                subtitle.innerText = 'Faça login para continuar';
             }
         }
 
