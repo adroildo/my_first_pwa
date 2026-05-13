@@ -100,6 +100,23 @@
         .animate-bounce-in {
             animation: bounce-in 0.6s ease-out;
         }
+
+        /* Modal / Bottom Sheet */
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+        }
+
+        .bottom-sheet {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(100%);
+        }
+
+        .bottom-sheet.active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 
@@ -214,12 +231,12 @@
                             <img src="https://i.pravatar.cc/300" alt="Avatar" class="w-full h-full object-cover">
                         </div>
                     </div>
-                    <div class="absolute bottom-1 right-1 w-8 h-8 bg-indigo-600 rounded-full border-4 border-white flex items-center justify-center text-white text-[10px]">
+                    <div class="absolute bottom-1 right-1 w-8 h-8 bg-indigo-600 rounded-full border-4 border-white flex items-center justify-center text-white text-[10px] active:scale-90 transition-transform" onclick="openEditModal()">
                         <i class="fa-solid fa-pen"></i>
                     </div>
                 </div>
-                <h3 class="mt-4 text-xl font-black text-slate-800">Usuário Premium</h3>
-                <p class="text-slate-400 text-sm font-medium">@usuario_premium</p>
+                <h3 id="display-name" class="mt-4 text-xl font-black text-slate-800">Usuário Premium</h3>
+                <p id="display-username" class="text-slate-400 text-sm font-medium">@usuario_premium</p>
             </div>
 
             <!-- Stats -->
@@ -296,6 +313,31 @@
         </a>
     </nav>
 
+    <!-- Modal de Edição (Bottom Sheet) -->
+    <div id="edit-modal" class="hidden fixed inset-0 z-[100]">
+        <div class="modal-overlay absolute inset-0" onclick="closeEditModal()"></div>
+        <div class="bottom-sheet absolute bottom-0 left-0 w-full bg-white rounded-t-[2.5rem] p-8 shadow-2xl">
+            <div class="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-8"></div>
+            
+            <h2 class="text-xl font-black text-slate-800 mb-6">Editar Perfil</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Nome Completo</label>
+                    <input type="text" id="input-name" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Nome de Usuário</label>
+                    <input type="text" id="input-username" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                </div>
+                
+                <button onclick="saveProfile()" class="w-full bg-indigo-600 text-white font-black uppercase py-4 rounded-2xl mt-4 shadow-lg shadow-indigo-100 active:scale-95 transition-transform">
+                    Salvar Alterações
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Navegação entre Seções
         const navItems = document.querySelectorAll('.nav-item');
@@ -326,6 +368,59 @@
                 }
             });
         });
+
+        // Lógica de Edição de Perfil
+        const editModal = document.getElementById('edit-modal');
+        const bottomSheet = editModal.querySelector('.bottom-sheet');
+        
+        function openEditModal() {
+            editModal.classList.remove('hidden');
+            setTimeout(() => bottomSheet.classList.add('active'), 10);
+            
+            // Carrega valores atuais nos inputs
+            document.getElementById('input-name').value = document.getElementById('display-name').innerText;
+            document.getElementById('input-username').value = document.getElementById('display-username').innerText.replace('@', '');
+        }
+
+        function closeEditModal() {
+            bottomSheet.classList.remove('active');
+            setTimeout(() => editModal.classList.add('hidden'), 300);
+        }
+
+        function saveProfile() {
+            const newName = document.getElementById('input-name').value;
+            const newUsername = document.getElementById('input-username').value;
+
+            if (newName && newUsername) {
+                // Atualiza UI
+                document.getElementById('display-name').innerText = newName;
+                document.getElementById('display-username').innerText = '@' + newUsername;
+
+                // Salva no LocalStorage
+                localStorage.setItem('userProfile', JSON.stringify({
+                    name: newName,
+                    username: newUsername
+                }));
+
+                closeEditModal();
+                
+                // Feedback de sucesso
+                console.log('Perfil atualizado!');
+            }
+        }
+
+        // Carregar Perfil Salvo ao Iniciar
+        function loadProfile() {
+            const savedProfile = localStorage.getItem('userProfile');
+            if (savedProfile) {
+                const profile = JSON.parse(savedProfile);
+                document.getElementById('display-name').innerText = profile.name;
+                document.getElementById('display-username').innerText = '@' + profile.username;
+            }
+        }
+
+        // Executar loadProfile ao carregar a página
+        window.addEventListener('load', loadProfile);
 
         // Registro do Service Worker para PWA
         if ('serviceWorker' in navigator) {
