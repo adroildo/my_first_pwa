@@ -317,23 +317,84 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-// Lógica de Instalação PWA
+// Lógica de Instalação PWA e Botão Arrastável
 let deferredPrompt;
-const installBanner = document.getElementById('install-banner');
+const installBtn = document.getElementById('install-banner');
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    installBanner.classList.remove('hidden');
+    installBtn.classList.remove('hidden');
 });
 
-installBanner.addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`Usuário escolheu: ${outcome}`);
-        deferredPrompt = null;
-        installBanner.classList.add('hidden');
+// Lógica de Arrastar (Drag)
+let isDragging = false;
+let currentX;
+let currentY;
+let initialX;
+let initialY;
+let xOffset = 0;
+let yOffset = 0;
+
+function dragStart(e) {
+    if (e.type === "touchstart") {
+        initialX = e.touches[0].clientX - xOffset;
+        initialY = e.touches[0].clientY - yOffset;
+    } else {
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+    }
+    if (e.target === installBtn || installBtn.contains(e.target)) {
+        isDragging = true;
+    }
+}
+
+function dragEnd(e) {
+    initialX = currentX;
+    initialY = currentY;
+    isDragging = false;
+}
+
+function drag(e) {
+    if (isDragging) {
+        e.preventDefault();
+        if (e.type === "touchmove") {
+            currentX = e.touches[0].clientX - initialX;
+            currentY = e.touches[0].clientY - initialY;
+        } else {
+            currentX = e.clientX - initialX;
+            currentY = e.clientY - initialY;
+        }
+        xOffset = currentX;
+        yOffset = currentY;
+        setTranslate(currentX, currentY, installBtn);
+    }
+}
+
+function setTranslate(xPos, yPos, el) {
+    el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+}
+
+// Eventos de Mouse e Touch para Arrastar
+document.addEventListener("touchstart", dragStart, false);
+document.addEventListener("touchend", dragEnd, false);
+document.addEventListener("touchmove", drag, { passive: false });
+
+document.addEventListener("mousedown", dragStart, false);
+document.addEventListener("mouseup", dragEnd, false);
+document.addEventListener("mousemove", drag, false);
+
+// Clique para instalar (só dispara se não for um arrasto longo)
+installBtn.addEventListener('click', async (e) => {
+    // Se moveu muito pouco, considera clique
+    if (Math.abs(xOffset) < 5 && Math.abs(yOffset) < 5) {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`Usuário escolheu: ${outcome}`);
+            deferredPrompt = null;
+            installBtn.classList.add('hidden');
+        }
     }
 });
 
