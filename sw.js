@@ -1,9 +1,36 @@
-// Service Worker Mínimo para PWA
+const CACHE_NAME = 'app-premium-v1';
+const ASSETS = [
+  './',
+  'index.html',
+  'manifest.json',
+  'icon-512.png'
+];
+
+// Instalação: Cacheia os arquivos essenciais
 self.addEventListener('install', (e) => {
-  console.log('[Service Worker] Install');
+  e.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+  );
 });
 
+// Ativação: Limpa caches antigos se necessário
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
+    caches.keys().then((keyList) => {
+      return Promise.all(keyList.map((key) => {
+        if (key !== CACHE_NAME) {
+          return caches.delete(key);
+        }
+      }));
+    })
+  );
+});
+
+// Fetch: Serve do cache se disponível, senão busca na rede
 self.addEventListener('fetch', (e) => {
-  // Apenas repassa as requisições (pode ser usado para cache no futuro)
-  e.respondWith(fetch(e.request));
+  e.respondWith(
+    caches.match(e.request).then((response) => {
+      return response || fetch(e.request);
+    })
+  );
 });
