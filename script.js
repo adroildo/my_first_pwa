@@ -327,32 +327,32 @@ window.addEventListener('beforeinstallprompt', (e) => {
     installBtn.classList.remove('hidden');
 });
 
-// Lógica de Arrastar (Drag)
+// Lógica de Arrastar (Drag) com Trava de Segurança Total
 let isDragging = false;
-let currentX;
-let currentY;
+let currentX = 0;
+let currentY = 0;
 let initialX;
 let initialY;
 let xOffset = 0;
 let yOffset = 0;
 
 function dragStart(e) {
-    if (e.type === "touchstart") {
-        initialX = e.touches[0].clientX - xOffset;
-        initialY = e.touches[0].clientY - yOffset;
-    } else {
-        initialX = e.clientX - xOffset;
-        initialY = e.clientY - yOffset;
-    }
     if (e.target === installBtn || installBtn.contains(e.target)) {
+        if (e.type === "touchstart") {
+            initialX = e.touches[0].clientX - xOffset;
+            initialY = e.touches[0].clientY - yOffset;
+        } else {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+        }
         isDragging = true;
     }
 }
 
 function dragEnd(e) {
+    isDragging = false;
     initialX = currentX;
     initialY = currentY;
-    isDragging = false;
 }
 
 function drag(e) {
@@ -368,23 +368,24 @@ function drag(e) {
             clientY = e.clientY;
         }
 
-        currentX = clientX - initialX;
-        currentY = clientY - initialY;
+        let newX = clientX - initialX;
+        let newY = clientY - initialY;
 
-        // LIMITES DE TELA
-        const btnRect = installBtn.getBoundingClientRect();
-        const maxX = window.innerWidth - btnRect.width - 24; // 24px de margem
-        const minX = -btnRect.left + 24;
-        const maxY = window.innerHeight - btnRect.height - 100; // 100px para não cobrir a nav
-        const minY = -btnRect.top + 70; // 70px para não cobrir o header
+        // Limites de Tela Reais
+        const rect = installBtn.getBoundingClientRect();
+        // Como o getBoundingClientRect muda com o translate, 
+        // precisamos compensar o offset atual para saber onde o botão estaria no 'zero'
+        const baseLeft = rect.left - xOffset;
+        const baseTop = rect.top - yOffset;
 
-        // Restrição X
-        if (currentX > maxX) currentX = maxX;
-        if (currentX < minX) currentX = minX;
+        const minX = -baseLeft + 10;
+        const maxX = window.innerWidth - baseLeft - rect.width - 10;
+        const minY = -baseTop + 70;
+        const maxY = window.innerHeight - baseTop - rect.height - 90;
 
-        // Restrição Y
-        if (currentY > maxY) currentY = maxY;
-        if (currentY < minY) currentY = minY;
+        // Aplica as travas
+        currentX = Math.max(minX, Math.min(newX, maxX));
+        currentY = Math.max(minY, Math.min(newY, maxY));
 
         xOffset = currentX;
         yOffset = currentY;
