@@ -439,7 +439,7 @@ const installBanner = document.getElementById('install-banner');
 const successToast = document.getElementById('success-toast');
 
 window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
+    // Não bloqueamos mais o padrão do navegador
     deferredPrompt = e;
     installBanner.classList.remove('hidden');
 });
