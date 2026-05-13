@@ -281,6 +281,33 @@ function handleLogout() {
     console.log('Logout realizado!');
 }
 
+// Lógica de Desenvolvimento: Limpar Cache
+async function clearAppCache() {
+    if (confirm('Deseja limpar o cache e forçar a atualização do app?')) {
+        // 1. Desregistrar Service Workers
+        if ('serviceWorker' in navigator) {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (let registration of registrations) {
+                await registration.unregister();
+            }
+        }
+        
+        // 2. Deletar todos os Caches
+        if ('caches' in window) {
+            const keys = await caches.keys();
+            for (let key of keys) {
+                await caches.delete(key);
+            }
+        }
+
+        // 3. Opcional: Limpar LocalStorage (Descomente se quiser um reset total)
+        // localStorage.clear();
+
+        // 4. Recarregar a página
+        location.reload(true);
+    }
+}
+
 // Registro do Service Worker para PWA
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
