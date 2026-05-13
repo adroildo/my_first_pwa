@@ -320,29 +320,19 @@ if ('serviceWorker' in navigator) {
 // Lógica de Instalação PWA
 let deferredPrompt;
 const installBanner = document.getElementById('install-banner');
-const installButton = document.getElementById('install-button');
-const successToast = document.getElementById('success-toast');
 
 window.addEventListener('beforeinstallprompt', (e) => {
-    // Impede que o Chrome mostre o prompt automático
     e.preventDefault();
-    // Guarda o evento para disparar depois
     deferredPrompt = e;
-    // Mostra o nosso banner customizado
-    console.log('Prompt de instalação capturado!');
     installBanner.classList.remove('hidden');
 });
 
-installButton.addEventListener('click', async () => {
+installBanner.addEventListener('click', async () => {
     if (deferredPrompt) {
-        // Mostra o prompt de instalação
         deferredPrompt.prompt();
-        // Espera pela resposta do usuário
         const { outcome } = await deferredPrompt.userChoice;
         console.log(`Usuário escolheu: ${outcome}`);
-        // Limpa o prompt
         deferredPrompt = null;
-        // Esconde o banner
         installBanner.classList.add('hidden');
     }
 });
