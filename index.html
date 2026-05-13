@@ -134,6 +134,19 @@
         </div>
     </div>
 
+    <!-- Toast de Sucesso (Instalação Concluída) -->
+    <div id="success-toast" class="hidden fixed bottom-24 left-6 right-6 z-50 animate-bounce-in">
+        <div class="p-4 rounded-2xl bg-emerald-500 text-white flex items-center space-x-3 shadow-2xl">
+            <div class="bg-white/20 p-2 rounded-xl text-lg">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold">Instalação Concluída!</p>
+                <p class="text-[10px] text-emerald-100">O ícone já está na sua tela inicial.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Conteúdo Rolável -->
     <div id="scroll-container">
         <div class="px-6 space-y-6">
@@ -266,6 +279,7 @@
         let deferredPrompt;
         const installBanner = document.getElementById('install-banner');
         const installButton = document.getElementById('install-button');
+        const successToast = document.getElementById('success-toast');
 
         window.addEventListener('beforeinstallprompt', (e) => {
             // Impede que o Chrome mostre o prompt automático
@@ -294,6 +308,14 @@
         window.addEventListener('appinstalled', (event) => {
             console.log('App instalado com sucesso!');
             installBanner.classList.add('hidden');
+
+            // Mostra o toast de sucesso
+            successToast.classList.remove('hidden');
+
+            // Esconde o toast após 4 segundos
+            setTimeout(() => {
+                successToast.classList.add('hidden');
+            }, 4000);
         });
     </script>
 </body>
