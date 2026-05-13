@@ -122,8 +122,38 @@
 
 <body>
 
+    <!-- SEÇÃO: AUTENTICAÇÃO (Login) -->
+    <div id="auth-section" class="fixed inset-0 z-[100] bg-white flex flex-col px-8 pt-20 overflow-y-auto">
+        <div class="flex flex-col items-center mb-12">
+            <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white text-4xl shadow-xl shadow-indigo-200 mb-6">
+                <i class="fa-solid fa-rocket"></i>
+            </div>
+            <h2 class="text-3xl font-black text-slate-900">Bem-vindo</h2>
+            <p class="text-slate-400 font-medium">Faça login para continuar</p>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">E-mail ou Usuário</label>
+                <input type="text" id="login-user" placeholder="seu@email.com" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+            </div>
+            <div>
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Senha</label>
+                <input type="password" id="login-pass" placeholder="••••••••" class="w-full bg-slate-50 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+            </div>
+            
+            <button onclick="handleLogin()" class="w-full bg-indigo-600 text-white font-black uppercase py-4 rounded-2xl mt-4 shadow-lg shadow-indigo-100 active:scale-95 transition-transform">
+                Entrar no App
+            </button>
+            
+            <p class="text-center text-xs font-bold text-slate-400 pt-4">
+                Não tem uma conta? <span class="text-indigo-600">Criar Agora</span>
+            </p>
+        </div>
+    </div>
+
     <!-- Header Fixo -->
-    <header class="app-header fixed top-0 left-0 w-full h-[70px] flex items-center justify-between px-6 z-40">
+    <header id="main-header" class="app-header fixed top-0 left-0 w-full h-[70px] flex items-center justify-between px-6 z-40 hidden">
         <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
             <i class="fa-solid fa-bars-staggered"></i>
         </div>
@@ -279,7 +309,7 @@
                     </div>
                     <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
                 </div>
-                <div class="card p-4 rounded-3xl flex items-center justify-between active:bg-red-50 border-red-50 transition-colors">
+                <div class="card p-4 rounded-3xl flex items-center justify-between active:bg-red-50 border-red-50 transition-colors" onclick="handleLogout()">
                     <div class="flex items-center space-x-4">
                         <div class="w-10 h-10 rounded-2xl bg-red-100 flex items-center justify-center text-red-500">
                             <i class="fa-solid fa-power-off"></i>
@@ -292,7 +322,7 @@
     </div>
 
     <!-- Menu Inferior (Bottom Nav) -->
-    <nav class="bottom-nav fixed bottom-0 left-0 w-full h-[75px] flex items-center justify-around z-50">
+    <nav id="main-nav" class="bottom-nav fixed bottom-0 left-0 w-full h-[75px] flex items-center justify-around z-50 hidden">
         <a href="#" data-page="home" class="nav-item active flex flex-col items-center">
             <i class="fa-solid fa-house text-xl mb-1"></i>
             <span class="text-[10px] font-bold uppercase tracking-widest">Home</span>
@@ -445,7 +475,52 @@
         }
 
         // Executar loadProfile ao carregar a página
-        window.addEventListener('load', loadProfile);
+        window.addEventListener('load', () => {
+            loadProfile();
+            checkAuth();
+        });
+
+        // Lógica de Autenticação
+        const authSection = document.getElementById('auth-section');
+        const mainHeader = document.getElementById('main-header');
+        const mainNav = document.getElementById('main-nav');
+        const scrollContainer = document.getElementById('scroll-container');
+
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            
+            if (isLoggedIn) {
+                authSection.classList.add('hidden');
+                mainHeader.classList.remove('hidden');
+                mainNav.classList.remove('hidden');
+                scrollContainer.classList.remove('hidden');
+            } else {
+                authSection.classList.remove('hidden');
+                mainHeader.classList.add('hidden');
+                mainNav.classList.add('hidden');
+                scrollContainer.classList.add('hidden');
+            }
+        }
+
+        function handleLogin() {
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+
+            if (user && pass) {
+                // Simulação de login
+                localStorage.setItem('isLoggedIn', 'true');
+                checkAuth();
+                console.log('Login realizado!');
+            } else {
+                alert('Por favor, preencha todos os campos.');
+            }
+        }
+
+        function handleLogout() {
+            localStorage.setItem('isLoggedIn', 'false');
+            checkAuth();
+            console.log('Logout realizado!');
+        }
 
         // Registro do Service Worker para PWA
         if ('serviceWorker' in navigator) {
