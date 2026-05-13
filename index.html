@@ -117,6 +117,20 @@
         .bottom-sheet.active {
             transform: translateY(0);
         }
+
+        /* Custom Alert */
+        #custom-alert {
+            transition: all 0.3s ease;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        #custom-alert.active {
+            pointer-events: auto;
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 
@@ -174,6 +188,41 @@
             <p class="text-center text-xs font-bold text-slate-400 pt-4">
                 Já tem uma conta? <button onclick="toggleAuth('login')" class="text-indigo-600">Fazer Login</button>
             </p>
+        </div>
+
+        <!-- Formulário de VERIFICAÇÃO -->
+        <div id="verify-form" class="space-y-6 hidden">
+            <div class="text-center">
+                <p class="text-sm text-slate-500 font-medium mb-6">Enviamos um código de 6 dígitos para o seu e-mail.</p>
+                <div class="flex justify-between gap-2 mb-6">
+                    <input type="text" maxlength="1" class="otp-input w-11 h-14 text-center text-xl font-black bg-slate-50 rounded-xl border-0 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                    <input type="text" maxlength="1" class="otp-input w-11 h-14 text-center text-xl font-black bg-slate-50 rounded-xl border-0 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                    <input type="text" maxlength="1" class="otp-input w-11 h-14 text-center text-xl font-black bg-slate-50 rounded-xl border-0 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                    <input type="text" maxlength="1" class="otp-input w-11 h-14 text-center text-xl font-black bg-slate-50 rounded-xl border-0 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                    <input type="text" maxlength="1" class="otp-input w-11 h-14 text-center text-xl font-black bg-slate-50 rounded-xl border-0 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                    <input type="text" maxlength="1" class="otp-input w-11 h-14 text-center text-xl font-black bg-slate-50 rounded-xl border-0 focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                </div>
+            </div>
+
+            <button onclick="handleVerify()" class="w-full bg-indigo-600 text-white font-black uppercase py-4 rounded-2xl shadow-lg shadow-indigo-100 active:scale-95 transition-transform">
+                Verificar Código
+            </button>
+
+            <div class="text-center space-y-2">
+                <p id="timer-text" class="text-xs font-bold text-slate-400">Reenviar em <span id="timer-count">60</span>s</p>
+                <button id="resend-btn" onclick="handleResend()" class="text-xs font-black text-indigo-600 hidden uppercase tracking-widest">Reenviar Código</button>
+                <p id="attempts-text" class="text-[10px] font-bold text-red-400 pt-2">Tentativas restantes: <span id="attempts-count">3</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Customizado -->
+    <div id="custom-alert" class="fixed top-10 left-6 right-6 z-[200]">
+        <div class="bg-slate-900 text-white p-4 rounded-2xl shadow-2xl flex items-center space-x-3 border-b-4 border-indigo-500">
+            <div id="alert-icon" class="text-indigo-400 text-lg">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <p id="alert-message" class="text-xs font-bold flex-1"></p>
         </div>
     </div>
 
@@ -535,11 +584,14 @@
                 // Simulação de login
                 localStorage.setItem('isLoggedIn', 'true');
                 checkAuth();
-                console.log('Login realizado!');
+                showAlert('Bem-vindo de volta!', 'fa-circle-check');
             } else {
-                alert('Por favor, preencha todos os campos.');
+                showAlert('Preencha e-mail e senha.');
             }
         }
+
+        let verificationTimer;
+        let attemptsLeft = 3;
 
         function handleSignup() {
             const name = document.getElementById('signup-name').value;
@@ -547,39 +599,124 @@
             const pass = document.getElementById('signup-pass').value;
 
             if (name && email && pass) {
-                // Simulação de cadastro
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('userProfile', JSON.stringify({
+                // Simulação de transição para verificação
+                toggleAuth('verify');
+                startTimer();
+                
+                // Salva temporariamente
+                localStorage.setItem('tempProfile', JSON.stringify({
                     name: name,
                     username: email.split('@')[0],
                     image: 'https://i.pravatar.cc/300'
                 }));
-                
-                loadProfile();
-                checkAuth();
-                console.log('Conta criada!');
             } else {
-                alert('Por favor, preencha todos os campos.');
+                showAlert('Preencha todos os campos.');
             }
         }
 
         function toggleAuth(mode) {
             const loginForm = document.getElementById('login-form');
             const signupForm = document.getElementById('signup-form');
+            const verifyForm = document.getElementById('verify-form');
             const title = document.getElementById('auth-title');
             const subtitle = document.getElementById('auth-subtitle');
 
+            loginForm.classList.add('hidden');
+            signupForm.classList.add('hidden');
+            verifyForm.classList.add('hidden');
+
             if (mode === 'signup') {
-                loginForm.classList.add('hidden');
                 signupForm.classList.remove('hidden');
                 title.innerText = 'Nova Conta';
                 subtitle.innerText = 'Comece sua jornada premium';
+            } else if (mode === 'verify') {
+                verifyForm.classList.remove('hidden');
+                title.innerText = 'Verificação';
+                subtitle.innerText = 'Digite o código enviado';
             } else {
                 loginForm.classList.remove('hidden');
-                signupForm.classList.add('hidden');
                 title.innerText = 'Bem-vindo';
                 subtitle.innerText = 'Faça login para continuar';
             }
+        }
+
+        // Lógica de Verificação
+        function startTimer() {
+            let timeLeft = 60;
+            const timerCount = document.getElementById('timer-count');
+            const timerText = document.getElementById('timer-text');
+            const resendBtn = document.getElementById('resend-btn');
+
+            resendBtn.classList.add('hidden');
+            timerText.classList.remove('hidden');
+
+            clearInterval(verificationTimer);
+            verificationTimer = setInterval(() => {
+                timeLeft--;
+                timerCount.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(verificationTimer);
+                    timerText.classList.add('hidden');
+                    resendBtn.classList.remove('hidden');
+                }
+            }, 1000);
+        }
+
+        function handleVerify() {
+            const otpInputs = document.querySelectorAll('.otp-input');
+            const code = Array.from(otpInputs).map(i => i.value).join('');
+
+            if (code.length === 6) {
+                if (code === '123456') { // Código de teste
+                    const temp = JSON.parse(localStorage.getItem('tempProfile'));
+                    localStorage.setItem('userProfile', JSON.stringify(temp));
+                    localStorage.setItem('isLoggedIn', 'true');
+                    checkAuth();
+                    showAlert('Conta verificada com sucesso!', 'fa-circle-check');
+                } else {
+                    attemptsLeft--;
+                    document.getElementById('attempts-count').innerText = attemptsLeft;
+                    if (attemptsLeft <= 0) {
+                        showAlert('Limite de tentativas atingido. Tente mais tarde.');
+                        setTimeout(() => location.reload(), 2000);
+                    } else {
+                        showAlert(`Código incorreto. Você tem ${attemptsLeft} tentativas.`);
+                    }
+                }
+            } else {
+                showAlert('Digite o código de 6 dígitos.');
+            }
+        }
+
+        function handleResend() {
+            showAlert('Novo código enviado para seu e-mail.');
+            startTimer();
+        }
+
+        // Auto-focus para inputs de código
+        document.querySelectorAll('.otp-input').forEach((input, idx) => {
+            input.addEventListener('keyup', (e) => {
+                if (e.key >= 0 && e.key <= 9) {
+                    if (input.nextElementSibling) input.nextElementSibling.focus();
+                } else if (e.key === 'Backspace') {
+                    if (input.previousElementSibling) input.previousElementSibling.focus();
+                }
+            });
+        });
+
+        // Alerta Customizado
+        function showAlert(msg, icon = 'fa-circle-info') {
+            const alert = document.getElementById('custom-alert');
+            const message = document.getElementById('alert-message');
+            const iconEl = document.getElementById('alert-icon');
+
+            message.innerText = msg;
+            iconEl.innerHTML = `<i class="fa-solid ${icon}"></i>`;
+            
+            alert.classList.add('active');
+            setTimeout(() => {
+                alert.classList.remove('active');
+            }, 3000);
         }
 
         function handleLogout() {
