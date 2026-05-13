@@ -327,7 +327,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     installBtn.classList.remove('hidden');
 });
 
-// Lógica de Arrastar (Drag) com Trava de Segurança Total
+// Lógica de Arrastar (Drag) - VERSÃO BLINDADA
 let isDragging = false;
 let currentX = 0;
 let currentY = 0;
@@ -335,6 +335,9 @@ let initialX;
 let initialY;
 let xOffset = 0;
 let yOffset = 0;
+
+// Limites pré-calculados
+let limitMinX, limitMaxX, limitMinY, limitMaxY;
 
 function dragStart(e) {
     if (e.target === installBtn || installBtn.contains(e.target)) {
@@ -345,6 +348,18 @@ function dragStart(e) {
             initialX = e.clientX - xOffset;
             initialY = e.clientY - yOffset;
         }
+
+        // Calcula os limites UMA VEZ no início do toque
+        const rect = installBtn.getBoundingClientRect();
+        // Posição base sem o transform atual
+        const baseLeft = rect.left - xOffset;
+        const baseTop = rect.top - yOffset;
+
+        limitMinX = -baseLeft + 10;
+        limitMaxX = window.innerWidth - baseLeft - rect.width - 10;
+        limitMinY = -baseTop + 70;
+        limitMaxY = window.innerHeight - baseTop - rect.height - 90;
+
         isDragging = true;
     }
 }
@@ -371,21 +386,9 @@ function drag(e) {
         let newX = clientX - initialX;
         let newY = clientY - initialY;
 
-        // Limites de Tela Reais
-        const rect = installBtn.getBoundingClientRect();
-        // Como o getBoundingClientRect muda com o translate, 
-        // precisamos compensar o offset atual para saber onde o botão estaria no 'zero'
-        const baseLeft = rect.left - xOffset;
-        const baseTop = rect.top - yOffset;
-
-        const minX = -baseLeft + 10;
-        const maxX = window.innerWidth - baseLeft - rect.width - 10;
-        const minY = -baseTop + 70;
-        const maxY = window.innerHeight - baseTop - rect.height - 90;
-
-        // Aplica as travas
-        currentX = Math.max(minX, Math.min(newX, maxX));
-        currentY = Math.max(minY, Math.min(newY, maxY));
+        // CLAMP (Trava Absoluta)
+        currentX = Math.min(Math.max(newX, limitMinX), limitMaxX);
+        currentY = Math.min(Math.max(newY, limitMinY), limitMaxY);
 
         xOffset = currentX;
         yOffset = currentY;
