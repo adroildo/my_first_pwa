@@ -395,7 +395,8 @@
 
             <h2 class="text-xl font-black text-slate-800 mb-6">Ações Rápidas</h2>
 
-            <div class="grid grid-cols-3 gap-4">
+            <!-- PÁGINA 1 -->
+            <div id="quick-page-1" class="grid grid-cols-3 gap-4 transition-all duration-300">
                 <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
                     <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-pen-to-square"></i>
@@ -426,11 +427,51 @@
                     </div>
                     <span class="text-[10px] font-bold text-slate-500 uppercase">Check-in</span>
                 </button>
-                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                <button onclick="toggleMoreOptions(true)" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
                     <div class="w-14 h-14 bg-slate-50 text-slate-600 rounded-2xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-ellipsis"></i>
                     </div>
                     <span class="text-[10px] font-bold text-slate-500 uppercase">Mais</span>
+                </button>
+            </div>
+
+            <!-- PÁGINA 2 (Escondida) -->
+            <div id="quick-page-2" class="hidden grid grid-cols-3 gap-4 transition-all duration-300">
+                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Agenda</span>
+                </button>
+                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Avisos</span>
+                </button>
+                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-cyan-50 text-cyan-600 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Arquivos</span>
+                </button>
+                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-user-group"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Contatos</span>
+                </button>
+                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-pink-50 text-pink-600 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Favoritos</span>
+                </button>
+                <button onclick="toggleMoreOptions(false)" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Voltar</span>
                 </button>
             </div>
 

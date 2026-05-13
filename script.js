@@ -55,7 +55,24 @@ function openQuickMenu() {
 
 function closeQuickMenu() {
     bottomSheetQuick.classList.remove('active');
-    setTimeout(() => quickMenu.classList.add('hidden'), 300);
+    setTimeout(() => {
+        quickMenu.classList.add('hidden');
+        // Reset para a página 1 ao fechar
+        toggleMoreOptions(false);
+    }, 300);
+}
+
+function toggleMoreOptions(showMore) {
+    const p1 = document.getElementById('quick-page-1');
+    const p2 = document.getElementById('quick-page-2');
+
+    if (showMore) {
+        p1.classList.add('hidden');
+        p2.classList.remove('hidden');
+    } else {
+        p2.classList.add('hidden');
+        p1.classList.remove('hidden');
+    }
 }
 
 function saveProfile() {
