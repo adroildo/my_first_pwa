@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
@@ -86,6 +86,20 @@
             border: 1px solid rgba(0, 0, 0, 0.03);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
         }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes bounce-in {
+            0% { transform: translateY(-20px); opacity: 0; }
+            60% { transform: translateY(5px); opacity: 1; }
+            100% { transform: translateY(0); }
+        }
+
+        .animate-bounce-in {
+            animation: bounce-in 0.6s ease-out;
+        }
     </style>
 </head>
 
@@ -101,6 +115,24 @@
             <i class="fa-solid fa-bell"></i>
         </div>
     </header>
+
+    <!-- Banner de Instalação (Escondido por padrão) -->
+    <div id="install-banner" class="hidden fixed top-[85px] left-6 right-6 z-30 animate-bounce-in">
+        <div class="card p-4 rounded-2xl bg-indigo-600 text-white flex items-center justify-between shadow-xl border-0">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/20 p-2 rounded-xl text-lg">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-bold">Instalar App</p>
+                    <p class="text-[10px] text-indigo-100">Para uma melhor experiência!</p>
+                </div>
+            </div>
+            <button id="install-button" class="bg-white text-indigo-600 text-[10px] font-black uppercase px-4 py-2 rounded-xl active:scale-95 transition-transform shadow-md">
+                Instalar
+            </button>
+        </div>
+    </div>
 
     <!-- Conteúdo Rolável -->
     <div id="scroll-container">
@@ -229,6 +261,40 @@
                     .catch(err => console.log('Erro ao registrar Service Worker', err));
             });
         }
+
+        // Lógica de Instalação PWA
+        let deferredPrompt;
+        const installBanner = document.getElementById('install-banner');
+        const installButton = document.getElementById('install-button');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Impede que o Chrome mostre o prompt automático
+            e.preventDefault();
+            // Guarda o evento para disparar depois
+            deferredPrompt = e;
+            // Mostra o nosso banner customizado
+            console.log('Prompt de instalação capturado!');
+            installBanner.classList.remove('hidden');
+        });
+
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                // Mostra o prompt de instalação
+                deferredPrompt.prompt();
+                // Espera pela resposta do usuário
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Usuário escolheu: ${outcome}`);
+                // Limpa o prompt
+                deferredPrompt = null;
+                // Esconde o banner
+                installBanner.classList.add('hidden');
+            }
+        });
+
+        window.addEventListener('appinstalled', (event) => {
+            console.log('App instalado com sucesso!');
+            installBanner.classList.add('hidden');
+        });
     </script>
 </body>
 
