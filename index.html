@@ -149,8 +149,9 @@
 
     <!-- Conteúdo Rolável -->
     <div id="scroll-container">
-        <div class="px-6 space-y-6">
-
+        
+        <!-- SEÇÃO: HOME -->
+        <div id="home-section" class="page-section px-6 space-y-6">
             <!-- Welcome Section -->
             <div class="pt-4">
                 <h2 class="text-2xl font-extrabold text-slate-900">Olá, Usuário!</h2>
@@ -201,27 +202,69 @@
                     </div>
                     <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
                 </div>
+            </div>
+        </div>
 
-                <div class="card p-4 rounded-3xl flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400">
-                        <i class="fa-solid fa-bolt"></i>
+        <!-- SEÇÃO: PERFIL -->
+        <div id="profile-section" class="page-section hidden px-6 space-y-8">
+            <div class="flex flex-col items-center pt-8">
+                <div class="relative">
+                    <div class="w-28 h-28 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 p-1 shadow-xl">
+                        <div class="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
+                            <i class="fa-solid fa-user text-5xl text-slate-200"></i>
+                        </div>
                     </div>
-                    <div class="flex-1">
-                        <h4 class="font-bold text-slate-800 text-sm">Performance</h4>
-                        <p class="text-xs text-slate-400">Otimizado com Sucesso</p>
+                    <div class="absolute bottom-1 right-1 w-8 h-8 bg-indigo-600 rounded-full border-4 border-white flex items-center justify-center text-white text-[10px]">
+                        <i class="fa-solid fa-pen"></i>
+                    </div>
+                </div>
+                <h3 class="mt-4 text-xl font-black text-slate-800">Usuário Premium</h3>
+                <p class="text-slate-400 text-sm font-medium">@usuario_premium</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-4">
+                <div class="card p-4 rounded-3xl text-center">
+                    <p class="text-lg font-black text-slate-800">12</p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Projetos</p>
+                </div>
+                <div class="card p-4 rounded-3xl text-center border-indigo-100 bg-indigo-50/30">
+                    <p class="text-lg font-black text-indigo-600">Premium</p>
+                    <p class="text-[10px] text-indigo-400 font-bold uppercase tracking-tighter">Plano</p>
+                </div>
+                <div class="card p-4 rounded-3xl text-center">
+                    <p class="text-lg font-black text-slate-800">84</p>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Tarefas</p>
+                </div>
+            </div>
+
+            <!-- Menu Opções -->
+            <div class="space-y-3">
+                <div class="card p-4 rounded-3xl flex items-center justify-between active:bg-slate-50 transition-colors">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500">
+                            <i class="fa-solid fa-gear"></i>
+                        </div>
+                        <span class="font-bold text-slate-700">Configurações</span>
                     </div>
                     <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
                 </div>
-
-                <div class="card p-4 rounded-3xl flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h4 class="font-bold text-slate-800 text-sm">Segurança</h4>
-                        <p class="text-xs text-slate-400">Proteção Ativada</p>
+                <div class="card p-4 rounded-3xl flex items-center justify-between active:bg-slate-50 transition-colors">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-500">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <span class="font-bold text-slate-700">Pagamento</span>
                     </div>
                     <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+                </div>
+                <div class="card p-4 rounded-3xl flex items-center justify-between active:bg-red-50 border-red-50 transition-colors">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 rounded-2xl bg-red-100 flex items-center justify-center text-red-500">
+                            <i class="fa-solid fa-power-off"></i>
+                        </div>
+                        <span class="font-bold text-red-500">Sair da Conta</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -229,11 +272,11 @@
 
     <!-- Menu Inferior (Bottom Nav) -->
     <nav class="bottom-nav fixed bottom-0 left-0 w-full h-[75px] flex items-center justify-around z-50">
-        <a href="#" class="nav-item active flex flex-col items-center">
+        <a href="#" data-page="home" class="nav-item active flex flex-col items-center">
             <i class="fa-solid fa-house text-xl mb-1"></i>
             <span class="text-[10px] font-bold uppercase tracking-widest">Home</span>
         </a>
-        <a href="#" class="nav-item flex flex-col items-center text-slate-400">
+        <a href="#" data-page="busca" class="nav-item flex flex-col items-center text-slate-400">
             <i class="fa-solid fa-magnifying-glass text-xl mb-1"></i>
             <span class="text-[10px] font-bold uppercase tracking-widest">Busca</span>
         </a>
@@ -243,26 +286,44 @@
                 <i class="fa-solid fa-plus text-xl"></i>
             </div>
         </div>
-        <a href="#" class="nav-item flex flex-col items-center text-slate-400">
+        <a href="#" data-page="dados" class="nav-item flex flex-col items-center text-slate-400">
             <i class="fa-solid fa-chart-pie text-xl mb-1"></i>
             <span class="text-[10px] font-bold uppercase tracking-widest">Dados</span>
         </a>
-        <a href="#" class="nav-item flex flex-col items-center text-slate-400">
+        <a href="#" data-page="perfil" class="nav-item flex flex-col items-center text-slate-400">
             <i class="fa-solid fa-user text-xl mb-1"></i>
             <span class="text-[10px] font-bold uppercase tracking-widest">Perfil</span>
         </a>
     </nav>
 
     <script>
-        // Lógica simples para alternar o estado ativo (apenas visual)
+        // Navegação entre Seções
         const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.page-section');
+
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
-                navItems.forEach(i => i.classList.remove('active', 'text-indigo-500'));
-                navItems.forEach(i => i.classList.add('text-slate-400'));
+                const page = item.getAttribute('data-page');
+                
+                if (!page) return;
+
+                // Atualiza UI do Menu
+                navItems.forEach(i => {
+                    i.classList.remove('active', 'text-indigo-500');
+                    i.classList.add('text-slate-400');
+                });
                 item.classList.add('active', 'text-indigo-500');
                 item.classList.remove('text-slate-400');
+
+                // Alterna Seções
+                sections.forEach(section => {
+                    section.classList.add('hidden');
+                });
+                const targetSection = document.getElementById(`${page}-section`);
+                if (targetSection) {
+                    targetSection.classList.remove('hidden');
+                }
             });
         });
 
