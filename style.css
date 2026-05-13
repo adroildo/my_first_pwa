@@ -14,13 +14,13 @@ body {
     overflow-x: hidden;
 }
 
-/* Otimização para Mobile (evita o bounce indesejado no topo em alguns navegadores) */
 html,
 body {
     height: 100%;
-    position: fixed;
-    overflow: hidden;
+    margin: 0;
+    padding: 0;
     width: 100%;
+    overflow: hidden;
 }
 
 #scroll-container {
@@ -39,11 +39,13 @@ body {
 }
 
 .bottom-nav {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-top: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.05);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    min-height: 70px;
 }
 
 .nav-item {
