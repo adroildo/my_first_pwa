@@ -30,11 +30,13 @@ navItems.forEach(item => {
 
 // Lógica de Edição de Perfil
 const editModal = document.getElementById('edit-modal');
-const bottomSheet = editModal.querySelector('.bottom-sheet');
+const quickMenu = document.getElementById('quick-menu');
+const bottomSheetEdit = editModal ? editModal.querySelector('.bottom-sheet') : null;
+const bottomSheetQuick = quickMenu ? quickMenu.querySelector('.bottom-sheet') : null;
 
 function openEditModal() {
     editModal.classList.remove('hidden');
-    setTimeout(() => bottomSheet.classList.add('active'), 10);
+    setTimeout(() => bottomSheetEdit.classList.add('active'), 10);
 
     // Carrega valores atuais nos inputs
     document.getElementById('input-name').value = document.getElementById('display-name').innerText;
@@ -42,8 +44,18 @@ function openEditModal() {
 }
 
 function closeEditModal() {
-    bottomSheet.classList.remove('active');
+    bottomSheetEdit.classList.remove('active');
     setTimeout(() => editModal.classList.add('hidden'), 300);
+}
+
+function openQuickMenu() {
+    quickMenu.classList.remove('hidden');
+    setTimeout(() => bottomSheetQuick.classList.add('active'), 10);
+}
+
+function closeQuickMenu() {
+    bottomSheetQuick.classList.remove('active');
+    setTimeout(() => quickMenu.classList.add('hidden'), 300);
 }
 
 function saveProfile() {

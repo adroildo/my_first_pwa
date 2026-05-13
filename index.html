@@ -372,11 +372,10 @@
             <i class="fa-solid fa-magnifying-glass text-xl mb-1"></i>
             <span class="text-[10px] font-bold uppercase tracking-widest">Busca</span>
         </a>
-        <div class="relative -top-6">
-            <div
-                class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-indigo-200 border-4 border-white active:scale-90 transition-transform">
-                <i class="fa-solid fa-plus text-xl"></i>
-            </div>
+        <div class="relative -top-5">
+            <button onclick="openQuickMenu()" class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-white text-2xl shadow-xl shadow-indigo-200 active:scale-90 transition-transform">
+                <i class="fa-solid fa-plus"></i>
+            </button>
         </div>
         <a href="#" data-page="dados" class="nav-item flex flex-col items-center text-slate-400">
             <i class="fa-solid fa-chart-pie text-xl mb-1"></i>
@@ -387,6 +386,60 @@
             <span class="text-[10px] font-bold uppercase tracking-widest">Perfil</span>
         </a>
     </nav>
+
+    <!-- Quick Menu Modal (Central Button) -->
+    <div id="quick-menu" class="hidden fixed inset-0 z-[100]">
+        <div class="modal-overlay absolute inset-0" onclick="closeQuickMenu()"></div>
+        <div class="bottom-sheet absolute bottom-0 left-0 w-full bg-white rounded-t-[2.5rem] p-8 shadow-2xl">
+            <div class="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-8"></div>
+
+            <h2 class="text-xl font-black text-slate-800 mb-6">Ações Rápidas</h2>
+
+            <div class="grid grid-cols-3 gap-4">
+                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Novo Post</span>
+                </button>
+                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Tarefa</span>
+                </button>
+                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-camera"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Câmera</span>
+                </button>
+                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Finanças</span>
+                </button>
+                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Check-in</span>
+                </button>
+                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-slate-50 text-slate-600 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Mais</span>
+                </button>
+            </div>
+
+            <button onclick="closeQuickMenu()"
+                class="w-full bg-slate-100 text-slate-500 font-black uppercase py-4 rounded-2xl mt-8 active:scale-95 transition-transform">
+                Fechar
+            </button>
+        </div>
+    </div>
 
     <!-- Modal de Edição (Bottom Sheet) -->
     <div id="edit-modal" class="hidden fixed inset-0 z-[100]">
