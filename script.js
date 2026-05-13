@@ -377,6 +377,7 @@ if ('serviceWorker' in navigator) {
 // Lógica de Instalação PWA
 let deferredPrompt;
 const installBanner = document.getElementById('install-banner');
+const successToast = document.getElementById('success-toast');
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
