@@ -54,13 +54,55 @@ function openQuickMenu() {
 }
 
 function closeQuickMenu() {
+    if (!bottomSheetQuick) return;
     bottomSheetQuick.classList.remove('active');
     setTimeout(() => {
         quickMenu.classList.add('hidden');
-        // Reset para a página 1 ao fechar
         toggleMoreOptions(false);
+        // Reset transform para a próxima vez
+        bottomSheetQuick.style.transform = '';
     }, 300);
 }
+
+// Lógica de "Swipe down to close" para Bottom Sheets
+let touchStartY = 0;
+let currentTranslateY = 0;
+
+function initBottomSheetGestures(sheet, closeFn) {
+    if (!sheet) return;
+
+    sheet.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+        sheet.style.transition = 'none'; // Desativa transição durante o drag
+    });
+
+    sheet.addEventListener('touchmove', (e) => {
+        const touchY = e.touches[0].clientY;
+        const deltaY = touchY - touchStartY;
+
+        if (deltaY > 0) { // Só arrasta para baixo
+            currentTranslateY = deltaY;
+            sheet.style.transform = `translateY(${deltaY}px)`;
+        }
+    });
+
+    sheet.addEventListener('touchend', () => {
+        sheet.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        if (currentTranslateY > 120) { // Threshold para fechar
+            closeFn();
+        } else {
+            sheet.style.transform = 'translateY(0)';
+        }
+        currentTranslateY = 0;
+    });
+}
+
+// Inicializa gestos nos dois modais
+window.addEventListener('load', () => {
+    initBottomSheetGestures(bottomSheetEdit, closeEditModal);
+    initBottomSheetGestures(bottomSheetQuick, closeQuickMenu);
+});
 
 function toggleMoreOptions(showMore) {
     const p1 = document.getElementById('quick-page-1');
