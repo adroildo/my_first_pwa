@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>14133 Fácil - Gestão Gamificada</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -51,7 +54,7 @@
             opacity: 0;
             transform: translateY(20px);
             pointer-events: none;
-            display: none;
+            display: none !important;
         }
 
         .active-content {
@@ -63,8 +66,8 @@
         .phase-track {
             position: absolute;
             left: 22px;
-            top: 24px; /* Começa no centro do círculo */
-            bottom: -24px; /* Estende até o início do próximo círculo */
+            top: 24px;
+            bottom: -24px;
             width: 4px;
             z-index: 0;
             border-radius: 2px;
@@ -80,12 +83,10 @@
             transition: height 0.6s ease-out;
         }
 
-        /* Ajuste para a última fase não ter linha sobrando */
         .phase-row:last-child .phase-track {
             display: none;
         }
 
-        /* Anel de Progresso Circular */
         .progress-circle {
             width: 48px;
             height: 48px;
@@ -102,7 +103,6 @@
             content: '';
             position: absolute;
             inset: 4px;
-            /* Espessura da borda */
             background: #f8fafc;
             border-radius: 50%;
             z-index: -1;
@@ -151,6 +151,36 @@
             transform: scale(0.97);
             transition: 0.1s;
         }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
@@ -159,8 +189,8 @@
 
     <header class="fixed top-0 left-0 right-0 z-40 bg-[#f8fafc]/80 backdrop-blur-md px-6 pt-10 pb-4">
         <div class="flex justify-between items-center mb-4">
-
-            <div class="flex items-center space-x-3">
+            <!-- LOBBY HEADER -->
+            <div id="header-user-info" class="flex items-center space-x-3 transition-opacity duration-300">
                 <div
                     class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg">
                     <i class="fa-solid fa-user-tie"></i>
@@ -168,10 +198,26 @@
                 <div>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Nível 12 • Especialista
                     </p>
-                    <h1 class="text-base font-bold leading-none">Carlos Oliveira</h1>
+                    <h1 class="text-base font-bold leading-none">Agente de Contratação</h1>
                 </div>
             </div>
-            <div class="flex space-x-2">
+
+            <!-- MATCH HEADER -->
+            <div id="header-match-info"
+                class="hidden items-center space-x-3 transition-opacity duration-300 flex-1 overflow-hidden pr-2">
+                <button onclick="closeMatch()"
+                    class="w-9 h-9 shrink-0 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-600 border border-slate-100 tap-feedback mr-1">
+                    <i class="fa-solid fa-arrow-left text-sm"></i>
+                </button>
+                <div class="overflow-hidden">
+                    <p class="text-[9px] font-bold text-blue-600 uppercase tracking-[1px] mb-0.5">Campanha em Andamento
+                    </p>
+                    <h1 id="currentMatchTitle" class="text-base font-black leading-none text-slate-800 truncate w-full">
+                        Carregando...</h1>
+                </div>
+            </div>
+
+            <div id="header-actions" class="flex space-x-2 shrink-0 transition-opacity duration-300">
                 <button
                     class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-500 border border-slate-100 tap-feedback">
                     <i class="fa-solid fa-magnifying-glass text-sm"></i>
@@ -184,7 +230,7 @@
             </div>
         </div>
 
-        <!-- Board de Stats Mini -->
+        <!-- STATS BOARD -->
         <div id="topStatsBoard" class="flex justify-between gap-2">
             <div class="flex-1 bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-3">
                 <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
@@ -192,7 +238,7 @@
                 </div>
                 <div>
                     <p class="text-[9px] font-bold text-slate-400 uppercase leading-none">XP Total</p>
-                    <p class="text-sm font-black">4.850</p>
+                    <p id="userXPDisplay" class="text-sm font-black">4.250</p>
                 </div>
             </div>
             <div class="flex-1 bg-white p-3 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-3">
@@ -208,82 +254,32 @@
     </header>
 
     <main class="h-full pt-44 pb-32 overflow-y-auto px-6 no-scrollbar">
-
         <div id="lobbyView" class="active-content page-transition">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xs font-black text-slate-400 uppercase tracking-[2px]">Campanhas Ativas</h2>
-                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-[9px] font-bold rounded-md uppercase">2
+                <span id="campaignCounter"
+                    class="px-2 py-1 bg-blue-100 text-blue-700 text-[9px] font-bold rounded-md uppercase">0
                     Partidas</span>
             </div>
 
-            <div class="space-y-4">
-                <!-- Card Campanha 1 -->
-                <div onclick="openMatch('Ar-Condicionado #04')"
-                    class="bg-white p-5 rounded-[32px] shadow-sm border border-slate-100 tap-feedback group">
-                    <div class="flex justify-between items-start mb-4">
-                        <div
-                            class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            <i class="fa-solid fa-snowflake text-xl"></i>
-                        </div>
-                        <span class="text-[9px] font-bold px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg">ETAPA:
-                            ETP</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800 mb-1 leading-tight">Manutenção Climatização</h3>
-                    <p class="text-xs text-slate-400 mb-4 font-medium">Processo Administrativo 2024/09</p>
-
-                    <div class="flex items-center justify-between">
-                        <div class="flex-1 mr-4">
-                            <div class="flex justify-between text-[10px] font-bold mb-1">
-                                <span class="text-slate-400">Progresso</span>
-                                <span class="text-blue-600">35%</span>
-                            </div>
-                            <div class="w-full h-1.5 bg-slate-100 rounded-full">
-                                <div class="h-full bg-blue-600 rounded-full" style="width: 35%"></div>
-                            </div>
-                        </div>
-                        <button
-                            class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg">
-                            <i class="fa-solid fa-play text-[10px]"></i>
-                        </button>
-                    </div>
+            <!-- ESTADO VAZIO / ESTADO DE ERRO -->
+            <div id="empty-state" class="hidden flex-col items-center justify-center py-16 text-center animate-fade-in">
+                <div
+                    class="w-20 h-20 bg-slate-100 rounded-[2rem] flex items-center justify-center text-slate-300 mb-6 shadow-inner">
+                    <i class="fa-solid fa-folder-open text-3xl"></i>
                 </div>
-
-                <!-- Card Campanha 2 -->
-                <div onclick="openMatch('Mobiliário Escolar')"
-                    class="bg-white p-5 rounded-[32px] shadow-sm border border-slate-100 tap-feedback opacity-90">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400">
-                            <i class="fa-solid fa-chair text-xl"></i>
-                        </div>
-                        <span class="text-[9px] font-bold px-2 py-1 bg-amber-100 text-amber-700 rounded-lg">ETAPA:
-                            TR</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800 mb-1 leading-tight">Renovação Mobiliário</h3>
-                    <div class="flex items-center justify-between mt-4">
-                        <div class="flex-1 mr-4">
-                            <div class="w-full h-1.5 bg-slate-100 rounded-full">
-                                <div class="h-full bg-amber-500 rounded-full" style="width: 72%"></div>
-                            </div>
-                        </div>
-                        <span class="text-[10px] font-black text-slate-400">72%</span>
-                    </div>
-                </div>
+                <h3 class="text-lg font-black text-slate-800 mb-2">Mesa de Trabalho Limpa</h3>
+                <p class="text-sm text-slate-500 font-medium px-4">Você ainda não possui processos ativos. Toque no
+                    botão <span class="font-bold text-blue-600">+</span> abaixo para iniciar sua primeira jornada na
+                    nova lei.</p>
             </div>
+
+            <div id="campaign-list" class="space-y-4"></div>
         </div>
 
         <div id="matchView" class="hidden-content page-transition">
-            <button onclick="closeMatch()"
-                class="flex items-center text-blue-600 text-[10px] font-bold uppercase tracking-widest mb-6">
-                <i class="fa-solid fa-arrow-left mr-2"></i> Voltar ao Lobby
-            </button>
-
-            <h2 id="currentMatchTitle" class="text-xl font-black text-slate-900 mb-8 leading-tight">Carregando...</h2>
-
-            <div class="relative pl-0 space-y-12 pb-20">
-                <!-- Fases dinâmicas injetadas via JS (com trilhas segmentadas) -->
-                <div id="etp-timeline-phase" class="space-y-4">
-                    <!-- Cards de missão injetados via JS -->
-                </div>
+            <div class="relative pl-0 space-y-12 pb-20 pt-2">
+                <div id="etp-timeline-phase" class="space-y-4"></div>
             </div>
         </div>
     </main>
@@ -293,155 +289,276 @@
             <i class="fa-solid fa-house-chimney text-lg"></i>
             <span class="text-[9px] font-bold uppercase tracking-tighter">Início</span>
         </button>
-
         <button class="flex flex-col items-center space-y-1 tap-feedback text-slate-400">
             <i class="fa-solid fa-compass text-lg"></i>
             <span class="text-[9px] font-bold uppercase tracking-tighter">Explorar</span>
         </button>
-
         <button onclick="createNewMission()"
             class="central-btn w-16 h-16 rounded-3xl bg-blue-600 text-white flex items-center justify-center text-2xl tap-feedback z-10">
             <i class="fa-solid fa-plus"></i>
         </button>
-
         <button class="flex flex-col items-center space-y-1 tap-feedback text-slate-400">
             <i class="fa-solid fa-list-check text-lg"></i>
             <span class="text-[9px] font-bold uppercase tracking-tighter">Tarefas</span>
         </button>
-
         <button class="flex flex-col items-center space-y-1 tap-feedback text-slate-400">
             <i class="fa-solid fa-award text-lg"></i>
             <span class="text-[9px] font-bold uppercase tracking-tighter">Ranking</span>
         </button>
     </nav>
 
-    <!-- MODAL DE FORMULÁRIO DA MISSÃO (TABS ELEGANTES) -->
-    <div id="missionFormModal" class="fixed inset-0 z-[110] bg-slate-50 dark:bg-slate-950 hidden flex flex-col animate-fade-in">
-        <!-- Overlay de Guia de Apoio (Fundamentação) -->
-        <div id="guidanceOverlay" class="fixed inset-0 z-[120] bg-slate-900/60 backdrop-blur-sm hidden items-end justify-center p-4">
-            <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[32px] p-8 shadow-2xl animate-slide-up">
-                <div class="w-12 h-1.5 bg-slate-200 dark:bg-white/10 rounded-full mx-auto mb-6"></div>
+    <!-- MODAL DE NOVA LICITAÇÃO -->
+    <div id="newCampaignModal"
+        class="fixed inset-0 z-[150] bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-6 animate-fade-in">
+        <div class="bg-white w-full max-w-sm rounded-[32px] p-6 shadow-2xl animate-slide-up">
+            <div class="flex justify-between items-center mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <i class="fa-solid fa-flag-checkered text-xl"></i>
+                </div>
+                <button onclick="closeNewCampaignModal()"
+                    class="w-10 h-10 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center tap-feedback">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <h3 class="text-xl font-black text-slate-800 mb-1">Nova Missão</h3>
+            <p class="text-xs font-medium text-slate-500 mb-6">Crie uma identidade visual para este processo
+                administrativo.</p>
+
+            <div class="mb-5">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-3">Ícone do
+                    Projeto</label>
+                <div class="flex space-x-3 overflow-x-auto no-scrollbar pb-2">
+                    <button onclick="selectIcon('fa-folder-open')"
+                        class="icon-btn w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 border-2 border-blue-600 flex items-center justify-center shrink-0 tap-feedback transition-all">
+                        <i class="fa-solid fa-folder-open text-lg"></i>
+                    </button>
+                    <button onclick="selectIcon('fa-laptop')"
+                        class="icon-btn w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 border-2 border-transparent flex items-center justify-center shrink-0 tap-feedback transition-all">
+                        <i class="fa-solid fa-laptop text-lg"></i>
+                    </button>
+                    <button onclick="selectIcon('fa-snowflake')"
+                        class="icon-btn w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 border-2 border-transparent flex items-center justify-center shrink-0 tap-feedback transition-all">
+                        <i class="fa-solid fa-snowflake text-lg"></i>
+                    </button>
+                    <button onclick="selectIcon('fa-car')"
+                        class="icon-btn w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 border-2 border-transparent flex items-center justify-center shrink-0 tap-feedback transition-all">
+                        <i class="fa-solid fa-car text-lg"></i>
+                    </button>
+                    <button onclick="selectIcon('fa-chair')"
+                        class="icon-btn w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 border-2 border-transparent flex items-center justify-center shrink-0 tap-feedback transition-all">
+                        <i class="fa-solid fa-chair text-lg"></i>
+                    </button>
+                    <button onclick="selectIcon('fa-building')"
+                        class="icon-btn w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 border-2 border-transparent flex items-center justify-center shrink-0 tap-feedback transition-all">
+                        <i class="fa-solid fa-building text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-3">Nome
+                    Curto</label>
+                <input type="text" id="newCampaignName" placeholder="Ex: Equipamentos 2024..."
+                    class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm font-bold text-slate-800 focus:border-blue-500 focus:bg-white outline-none transition-all">
+            </div>
+
+            <button onclick="startNewCampaign(event)"
+                class="w-full py-4 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-blue-200 active:scale-95 transition-all">
+                Iniciar Jornada
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL DE FORMULÁRIO DA MISSÃO -->
+    <div id="missionFormModal" class="fixed inset-0 z-[110] bg-slate-50 hidden flex flex-col animate-fade-in">
+        <div id="guidanceOverlay"
+            class="fixed inset-0 z-[120] bg-slate-900/60 backdrop-blur-sm hidden items-end justify-center p-4">
+            <div class="bg-white w-full max-w-lg rounded-[32px] p-8 shadow-2xl animate-slide-up">
+                <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
                 <div class="flex items-center space-x-4 mb-6">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center">
                         <i class="fa-solid fa-gavel text-xl"></i>
                     </div>
                     <div>
-                        <h3 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Guia do Especialista</h3>
+                        <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">Guia do Especialista</h3>
                         <p class="text-[10px] font-bold text-slate-400 uppercase">Fundamentação e Dicas</p>
                     </div>
                 </div>
-                
                 <div class="space-y-6">
                     <div>
-                        <span class="text-[9px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-widest mb-2 inline-block">Base Legal</span>
-                        <p id="guidance-legal" class="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+                        <span
+                            class="text-[9px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-widest mb-2 inline-block">Base
+                            Legal</span>
+                        <p id="guidance-legal" class="text-xs font-medium text-slate-600 leading-relaxed"></p>
                     </div>
                     <div>
-                        <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-widest mb-2 inline-block">Como Preencher</span>
-                        <p id="guidance-tips" class="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed italic"></p>
+                        <span
+                            class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-widest mb-2 inline-block">Como
+                            Preencher</span>
+                        <p id="guidance-tips" class="text-xs font-medium text-slate-600 leading-relaxed italic"></p>
                     </div>
                 </div>
-
-                <button onclick="toggleGuidance()" class="w-full mt-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black rounded-2xl shadow-lg tap-feedback uppercase tracking-widest">
+                <button onclick="toggleGuidance()"
+                    class="w-full mt-8 py-4 bg-slate-900 text-white text-xs font-black rounded-2xl shadow-lg tap-feedback uppercase tracking-widest">
                     Entendi, obrigado!
                 </button>
             </div>
         </div>
 
-        <!-- Header do Formulário -->
-        <header class="h-[80px] bg-white dark:bg-slate-900 shadow-sm flex items-center px-6 justify-between flex-shrink-0">
-            <button onclick="closeMissionForm()" class="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-400 flex items-center justify-center active:scale-90 transition-transform">
+        <header class="h-[80px] bg-white shadow-sm flex items-center px-6 justify-between flex-shrink-0">
+            <button onclick="closeMissionForm()"
+                class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center active:scale-90 transition-transform">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div class="text-center flex flex-col items-center">
                 <div class="w-8 h-1 bg-blue-600 rounded-full mb-2 opacity-20"></div>
-                <h2 class="text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-[0.2em]">Missão em Curso</h2>
-                <p id="form-header-phase" class="text-[9px] font-bold text-slate-400 uppercase">Documento de Formalização</p>
+                <h2 class="text-[10px] font-black text-slate-800 uppercase tracking-[0.2em]">Missão em Curso</h2>
+                <p id="form-header-phase" class="text-[9px] font-bold text-slate-400 uppercase">Documento de
+                    Formalização</p>
             </div>
-            <!-- Ícone Elegante de Selo -->
-            <div id="mission-badge" class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center transition-all duration-500">
+            <div id="mission-badge"
+                class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center transition-all duration-500">
                 <i class="fa-solid fa-scroll"></i>
             </div>
         </header>
 
-        <!-- Navegação por Abas (Dinâmicas) -->
-        <div id="mission-tabs-container" class="flex px-6 pt-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-white/5 overflow-x-auto no-scrollbar">
+        <div id="mission-tabs-container"
+            class="flex px-6 pt-6 bg-white border-b border-slate-100 overflow-x-auto no-scrollbar">
             <!-- TABS DFD (Fase 1) -->
-            <button onclick="switchTab(21)" id="tab-21-btn" class="mission-tab dfd1-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1. Origem</button>
-            <button onclick="switchTab(22)" id="tab-22-btn" class="mission-tab dfd1-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2. Responsável</button>
-            
-            <button onclick="switchTab(23)" id="tab-23-btn" class="mission-tab dfd2-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1. Objeto</button>
-            <button onclick="switchTab(24)" id="tab-24-btn" class="mission-tab dfd2-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2. Quantidade</button>
+            <button onclick="switchTab(21)" id="tab-21-btn" data-group="dfd1"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1.
+                Origem</button>
+            <button onclick="switchTab(22)" id="tab-22-btn" data-group="dfd1"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2.
+                Responsável</button>
 
-            <button onclick="switchTab(25)" id="tab-25-btn" class="mission-tab dfd3-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1. Valor</button>
-            <button onclick="switchTab(26)" id="tab-26-btn" class="mission-tab dfd3-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2. Prazo</button>
+            <button onclick="switchTab(23)" id="tab-23-btn" data-group="dfd2"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1.
+                Objeto</button>
+            <button onclick="switchTab(24)" id="tab-24-btn" data-group="dfd2"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2.
+                Quantidade</button>
 
-            <button onclick="switchTab(27)" id="tab-27-btn" class="mission-tab dfd4-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1. Prioridade</button>
-            <button onclick="switchTab(28)" id="tab-28-btn" class="mission-tab dfd4-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2. Equipe</button>
+            <button onclick="switchTab(25)" id="tab-25-btn" data-group="dfd3"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1.
+                Valor</button>
+            <button onclick="switchTab(26)" id="tab-26-btn" data-group="dfd3"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2.
+                Prazo</button>
 
-            <!-- TABS ETP (Fase 2 - Já existentes) -->
-            <button onclick="switchTab(1)" id="tab-1-btn" class="mission-tab m1-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1. Necessidade</button>
-            <button onclick="switchTab(2)" id="tab-2-btn" class="mission-tab m1-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2. Requisitos</button>
-            <button onclick="switchTab(3)" id="tab-3-btn" class="mission-tab m1-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">3. Quantitativos</button>
-            <!-- ... abas m2, m3, m4 continuam aqui ... -->
+            <button onclick="switchTab(27)" id="tab-27-btn" data-group="dfd4"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1.
+                Prioridade</button>
+            <button onclick="switchTab(28)" id="tab-28-btn" data-group="dfd4"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2.
+                Equipe</button>
+
+            <!-- TABS ETP (Fase 2) -->
+            <button onclick="switchTab(1)" id="tab-1-btn" data-group="m1"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1.
+                Necessidade</button>
+            <button onclick="switchTab(2)" id="tab-2-btn" data-group="m1"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2.
+                Requisitos</button>
+            <button onclick="switchTab(3)" id="tab-3-btn" data-group="m1"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">3.
+                Quantitativos</button>
+
+            <button onclick="switchTab(4)" id="tab-4-btn" data-group="m2"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1.
+                Mercado</button>
+            <button onclick="switchTab(5)" id="tab-5-btn" data-group="m2"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2.
+                Custos</button>
+            <button onclick="switchTab(6)" id="tab-6-btn" data-group="m2"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">3.
+                Parcelamento</button>
+
+            <button onclick="switchTab(7)" id="tab-7-btn" data-group="m3"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1.
+                Resultados</button>
+            <button onclick="switchTab(8)" id="tab-8-btn" data-group="m3"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2.
+                Providências</button>
+            <button onclick="switchTab(9)" id="tab-9-btn" data-group="m3"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">3.
+                Correlatas</button>
+
+            <button onclick="switchTab(10)" id="tab-10-btn" data-group="m4"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1.
+                Solução Final</button>
+            <button onclick="switchTab(11)" id="tab-11-btn" data-group="m4"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2.
+                Impactos</button>
+            <button onclick="switchTab(12)" id="tab-12-btn" data-group="m4"
+                class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">3.
+                Viabilidade</button>
         </div>
 
-        <!-- Conteúdo das Abas -->
         <div class="flex-1 overflow-y-auto p-6 space-y-6">
             <!-- CONTEÚDO DFD M1 -->
-            <div id="mission-tab-21" class="tab-content dfd1-content hidden space-y-4">
+            <div id="mission-tab-21" data-group="dfd1" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Justificativa da Demanda <span class="text-rose-500">*</span></label>
-                    <textarea id="dfd-field-just" oninput="checkFormCompletion()" placeholder="Qual o problema identificado?" 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Justificativa da
+                        Demanda <span class="text-rose-500">*</span></label>
+                    <textarea id="dfd-field-just" oninput="checkFormCompletion()"
+                        placeholder="Qual o problema identificado?"
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-            <div id="mission-tab-22" class="tab-content dfd1-content hidden space-y-4">
+            <div id="mission-tab-22" data-group="dfd1" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Área Requisitante <span class="text-rose-500">*</span></label>
-                    <input id="dfd-field-area" oninput="checkFormCompletion()" type="text" placeholder="Nome do setor responsável" 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all">
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Área Requisitante
+                        <span class="text-rose-500">*</span></label>
+                    <input id="dfd-field-area" oninput="checkFormCompletion()" type="text"
+                        placeholder="Nome do setor responsável"
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all">
                 </div>
             </div>
-
             <!-- CONTEÚDO DFD M2 -->
-            <div id="mission-tab-23" class="tab-content dfd2-content hidden space-y-4">
+            <div id="mission-tab-23" data-group="dfd2" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Descrição Sucinta do Objeto <span class="text-rose-500">*</span></label>
-                    <textarea id="dfd-field-obj" oninput="checkFormCompletion()" placeholder="O que se pretende contratar?" 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Descrição Sucinta do
+                        Objeto <span class="text-rose-500">*</span></label>
+                    <textarea id="dfd-field-obj" oninput="checkFormCompletion()"
+                        placeholder="O que se pretende contratar?"
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-            <div id="mission-tab-24" class="tab-content dfd2-content hidden space-y-4">
+            <div id="mission-tab-24" data-group="dfd2" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Quantidade Estimada <span class="text-rose-500">*</span></label>
-                    <input id="dfd-field-quant" oninput="checkFormCompletion()" type="text" placeholder="Ex: 50 unidades, 12 meses..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all">
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Quantidade Estimada
+                        <span class="text-rose-500">*</span></label>
+                    <input id="dfd-field-quant" oninput="checkFormCompletion()" type="text"
+                        placeholder="Ex: 50 unidades, 12 meses..."
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all">
                 </div>
             </div>
-
             <!-- CONTEÚDO DFD M3 -->
-            <div id="mission-tab-25" class="tab-content dfd3-content hidden space-y-4">
+            <div id="mission-tab-25" data-group="dfd3" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Estimativa Preliminar de Valor <span class="text-rose-500">*</span></label>
-                    <input id="dfd-field-valor" oninput="checkFormCompletion()" type="text" placeholder="Valor global estimado R$" 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all">
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Estimativa Preliminar
+                        de Valor <span class="text-rose-500">*</span></label>
+                    <input id="dfd-field-valor" oninput="checkFormCompletion()" type="text"
+                        placeholder="Valor global estimado R$"
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all">
                 </div>
             </div>
-            <div id="mission-tab-26" class="tab-content dfd3-content hidden space-y-4">
+            <div id="mission-tab-26" data-group="dfd3" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Data Pretendida para Entrega <span class="text-rose-500">*</span></label>
-                    <input id="dfd-field-data" oninput="checkFormCompletion()" type="date" 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all">
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Data Pretendida para
+                        Entrega <span class="text-rose-500">*</span></label>
+                    <input id="dfd-field-data" oninput="checkFormCompletion()" type="date"
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all">
                 </div>
             </div>
-
             <!-- CONTEÚDO DFD M4 -->
-            <div id="mission-tab-27" class="tab-content dfd4-content hidden space-y-4">
+            <div id="mission-tab-27" data-group="dfd4" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Grau de Prioridade <span class="text-rose-500">*</span></label>
-                    <select id="dfd-field-prio" oninput="checkFormCompletion()" 
-                        class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white outline-none">
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Grau de Prioridade
+                        <span class="text-rose-500">*</span></label>
+                    <select id="dfd-field-prio" oninput="checkFormCompletion()"
+                        class="w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-bold text-slate-800 outline-none">
                         <option value="">Selecione...</option>
                         <option value="Alta">Alta</option>
                         <option value="Media">Média</option>
@@ -449,171 +566,160 @@
                     </select>
                 </div>
             </div>
-            <div id="mission-tab-28" class="tab-content dfd4-content hidden space-y-4">
+            <div id="mission-tab-28" data-group="dfd4" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Equipe de Planejamento <span class="text-rose-500">*</span></label>
-                    <textarea id="dfd-field-equipe" oninput="checkFormCompletion()" placeholder="Sugestão de servidores para a equipe..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Equipe de
+                        Planejamento <span class="text-rose-500">*</span></label>
+                    <textarea id="dfd-field-equipe" oninput="checkFormCompletion()"
+                        placeholder="Sugestão de servidores para a equipe..."
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
 
-            <!-- ... conteudos etp m1, m2, m3, m4 continuam aqui ... -->
-            
             <!-- CONTEÚDO ETP M1 -->
-            <div id="mission-tab-1" class="tab-content m1-content hidden space-y-4">
+            <div id="mission-tab-1" data-group="m1" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Descrição da Necessidade <span class="text-rose-500">*</span></label>
-                    <textarea id="field-desc" oninput="checkFormCompletion()" placeholder="Qual o problema a ser resolvido?" 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Descrição da
+                        Necessidade <span class="text-rose-500">*</span></label>
+                    <textarea id="field-desc" oninput="checkFormCompletion()"
+                        placeholder="Qual o problema a ser resolvido?"
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-
-            <div id="mission-tab-2" class="tab-content m1-content hidden space-y-4">
+            <div id="mission-tab-2" data-group="m1" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Requisitos da Contratação <span class="text-rose-500">*</span></label>
-                    <textarea id="field-req" oninput="checkFormCompletion()" placeholder="O que é essencial para a solução?" 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Requisitos da
+                        Contratação <span class="text-rose-500">*</span></label>
+                    <textarea id="field-req" oninput="checkFormCompletion()"
+                        placeholder="O que é essencial para a solução?"
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-            <div id="mission-tab-3" class="tab-content m1-content hidden space-y-4">
+            <div id="mission-tab-3" data-group="m1" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Estimativa de Quantidades <span class="text-rose-500">*</span></label>
-                    <textarea id="field-quant" oninput="checkFormCompletion()" placeholder="Memória de cálculo e quantidades estimadas..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Estimativa de
+                        Quantidades <span class="text-rose-500">*</span></label>
+                    <textarea id="field-quant" oninput="checkFormCompletion()"
+                        placeholder="Memória de cálculo e quantidades estimadas..."
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-
             <!-- CONTEÚDO M2 -->
-            <div id="mission-tab-4" class="tab-content m2-content hidden space-y-4">
+            <div id="mission-tab-4" data-group="m2" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Levantamento de Mercado <span class="text-rose-500">*</span></label>
-                    <textarea id="field-merc" oninput="checkFormCompletion()" placeholder="Alternativas possíveis e justificativa da escolha..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Levantamento de
+                        Mercado <span class="text-rose-500">*</span></label>
+                    <textarea id="field-merc" oninput="checkFormCompletion()"
+                        placeholder="Alternativas possíveis e justificativa da escolha..."
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-            <div id="mission-tab-5" class="tab-content m2-content hidden space-y-4">
+            <div id="mission-tab-5" data-group="m2" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Estimativa de Custos <span class="text-rose-500">*</span></label>
-                    <textarea id="field-cost" oninput="checkFormCompletion()" placeholder="Preços referenciais e documentos de suporte..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Estimativa de Custos
+                        <span class="text-rose-500">*</span></label>
+                    <textarea id="field-cost" oninput="checkFormCompletion()"
+                        placeholder="Preços referenciais e documentos de suporte..."
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-            <div id="mission-tab-6" class="tab-content m2-content hidden space-y-4">
+            <div id="mission-tab-6" data-group="m2" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Justificativa de Parcelamento <span class="text-rose-500">*</span></label>
-                    <textarea id="field-parc" oninput="checkFormCompletion()" placeholder="Por que dividir (ou não) o objeto?" 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Justificativa de
+                        Parcelamento <span class="text-rose-500">*</span></label>
+                    <textarea id="field-parc" oninput="checkFormCompletion()"
+                        placeholder="Por que dividir (ou não) o objeto?"
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-
             <!-- CONTEÚDO M3 -->
-            <div id="mission-tab-7" class="tab-content m3-content hidden space-y-4">
+            <div id="mission-tab-7" data-group="m3" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Resultados Pretendidos <span class="text-rose-500">*</span></label>
-                    <textarea id="field-res" oninput="checkFormCompletion()" placeholder="Economicidade e eficácia esperada..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Resultados
+                        Pretendidos <span class="text-rose-500">*</span></label>
+                    <textarea id="field-res" oninput="checkFormCompletion()"
+                        placeholder="Economicidade e eficácia esperada..."
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-            <div id="mission-tab-8" class="tab-content m3-content hidden space-y-4">
+            <div id="mission-tab-8" data-group="m3" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Providências Prévias <span class="text-rose-500">*</span></label>
-                    <textarea id="field-prov" oninput="checkFormCompletion()" placeholder="Ações antes da celebração do contrato..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Providências Prévias
+                        <span class="text-rose-500">*</span></label>
+                    <textarea id="field-prov" oninput="checkFormCompletion()"
+                        placeholder="Ações antes da celebração do contrato..."
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-            <div id="mission-tab-9" class="tab-content m3-content hidden space-y-4">
+            <div id="mission-tab-9" data-group="m3" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Contratações Correlatas <span class="text-rose-500">*</span></label>
-                    <textarea id="field-corr" oninput="checkFormCompletion()" placeholder="Contratações interdependentes detectadas..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Contratações
+                        Correlatas <span class="text-rose-500">*</span></label>
+                    <textarea id="field-corr" oninput="checkFormCompletion()"
+                        placeholder="Contratações interdependentes detectadas..."
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-
             <!-- CONTEÚDO M4 -->
-            <div id="mission-tab-10" class="tab-content m4-content hidden space-y-4">
+            <div id="mission-tab-10" data-group="m4" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Descrição da Solução Final <span class="text-rose-500">*</span></label>
-                    <textarea id="field-sol" oninput="checkFormCompletion()" placeholder="Detalhamento técnico da solução escolhida..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Descrição da Solução
+                        Final <span class="text-rose-500">*</span></label>
+                    <textarea id="field-sol" oninput="checkFormCompletion()"
+                        placeholder="Detalhamento técnico da solução escolhida..."
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-            <div id="mission-tab-11" class="tab-content m4-content hidden space-y-4">
+            <div id="mission-tab-11" data-group="m4" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Impactos Ambientais <span class="text-rose-500">*</span></label>
-                    <textarea id="field-amb" oninput="checkFormCompletion()" placeholder="Descrição dos impactos e medidas de tratamento..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Impactos Ambientais
+                        <span class="text-rose-500">*</span></label>
+                    <textarea id="field-amb" oninput="checkFormCompletion()"
+                        placeholder="Descrição dos impactos e medidas de tratamento..."
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
-            <div id="mission-tab-12" class="tab-content m4-content hidden space-y-4">
+            <div id="mission-tab-12" data-group="m4" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Viabilidade da Contratação <span class="text-rose-500">*</span></label>
-                    <textarea id="field-viab" oninput="checkFormCompletion()" placeholder="Posicionamento conclusivo sobre a viabilidade..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Viabilidade da
+                        Contratação <span class="text-rose-500">*</span></label>
+                    <textarea id="field-viab" oninput="checkFormCompletion()"
+                        placeholder="Posicionamento conclusivo sobre a viabilidade..."
+                        class="mission-input w-full bg-white border-2 border-slate-100 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
         </div>
 
-        <!-- RODAPÉ PREMIUM DO FORMULÁRIO -->
         <nav class="glass-nav h-24 px-10 pb-4 flex justify-between items-center flex-shrink-0">
-            <!-- Salvar -->
-            <button onclick="saveProgress()" class="flex flex-col items-center space-y-1 tap-feedback text-slate-400 active:text-blue-600 transition-colors">
+            <button onclick="saveProgress()"
+                class="flex flex-col items-center space-y-1 tap-feedback text-slate-400 active:text-blue-600 transition-colors">
                 <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
                 <span class="text-[9px] font-black uppercase tracking-tighter">Salvar</span>
             </button>
-
-            <!-- BOTÃO CENTRAL: GUIA DE APOIO -->
             <button onclick="toggleGuidance()"
                 class="central-btn w-16 h-16 rounded-3xl bg-amber-500 text-white flex items-center justify-center text-xl shadow-[0_8px_25px_-5px_rgba(245,158,11,0.5)] active:scale-95 transition-all z-10">
                 <i class="fa-solid fa-lightbulb"></i>
             </button>
-
-            <!-- Concluir -->
-            <button id="finish-mission-btn" onclick="finishMission()" disabled 
+            <button id="finish-mission-btn" onclick="finishMission(event)" disabled
                 class="flex flex-col items-center space-y-1 tap-feedback text-slate-200 pointer-events-none transition-all duration-300">
                 <i class="fa-solid fa-circle-check text-xl"></i>
                 <span class="text-[9px] font-black uppercase tracking-tighter">Concluir</span>
             </button>
         </nav>
-
-        <!-- Menu de Ferramentas (Pop-up do botão central) -->
-        <div id="mission-tools-menu" class="fixed inset-x-6 bottom-28 bg-white dark:bg-slate-900 rounded-[2.5rem] p-6 shadow-2xl border border-slate-100 dark:border-white/5 hidden animate-fade-in z-[120]">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-2">Recursos de Apoio</p>
-            <div class="grid grid-cols-2 gap-3">
-                <a href="https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm" target="_blank" 
-                    class="flex items-center space-x-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl active:scale-95 transition-all">
-                    <i class="fa-solid fa-gavel text-amber-500"></i>
-                    <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Lei 14.133</span>
-                </a>
-                <a href="https://www.gov.br/pncp/pt-br" target="_blank" 
-                    class="flex items-center space-x-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl active:scale-95 transition-all">
-                    <i class="fa-solid fa-magnifying-glass-chart text-blue-500"></i>
-                    <span class="text-xs font-bold text-slate-700 dark:text-slate-200">PNCP</span>
-                </a>
-                <button class="flex items-center space-x-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl active:scale-95 transition-all">
-                    <i class="fa-solid fa-calculator text-emerald-500"></i>
-                    <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Cálculos</span>
-                </button>
-                <button class="flex items-center space-x-3 p-4 bg-slate-50 dark:bg-white/5 rounded-2xl active:scale-95 transition-all">
-                    <i class="fa-solid fa-file-pdf text-rose-500"></i>
-                    <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Modelos</span>
-                </button>
-            </div>
-        </div>
     </div>
 
-    <!-- MODAL DE SUCESSO (ESTILO DUOLINGO) -->
-    <div id="successModal" class="fixed inset-0 z-[100] bg-white hidden flex flex-col items-center justify-center px-10 text-center animate-fade-in">
+    <!-- MODAL DE SUCESSO -->
+    <div id="successModal"
+        class="fixed inset-0 z-[100] bg-white hidden flex flex-col items-center justify-center px-10 text-center animate-fade-in">
         <div class="mb-8 relative">
-            <div class="w-32 h-32 bg-yellow-400 rounded-full flex items-center justify-center shadow-2xl shadow-yellow-200 animate-bounce">
+            <div
+                class="w-32 h-32 bg-yellow-400 rounded-full flex items-center justify-center shadow-2xl shadow-yellow-200 animate-bounce">
                 <i class="fa-solid fa-trophy text-white text-5xl"></i>
             </div>
-            <!-- Brilho ao fundo -->
             <div class="absolute inset-0 bg-yellow-400 rounded-full blur-3xl opacity-30 animate-pulse"></div>
         </div>
-
         <h2 class="text-3xl font-black text-slate-900 mb-2">Missão Cumprida!</h2>
         <p class="text-slate-500 font-medium mb-8">Você avançou no processo e ganhou bônus de experiência.</p>
-
         <div class="bg-slate-50 rounded-[2rem] p-6 w-full mb-10 border border-slate-100">
             <div class="flex justify-around">
                 <div>
@@ -623,77 +729,323 @@
                 <div class="w-px h-10 bg-slate-200"></div>
                 <div>
                     <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Posição</p>
-                    <p class="text-2xl font-black text-emerald-500">↑ 2º</p>
+                    <p class="text-2xl font-black text-emerald-500">↑</p>
                 </div>
             </div>
         </div>
-
-        <button onclick="closeSuccessModal()" 
+        <button onclick="closeSuccessModal()"
             class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-200 active:scale-95 transition-all">
             Continuar Jornada
         </button>
     </div>
 
-    <script>
-        let userXP = 4850;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        function openMatch(title) {
+        // ==============================================================================
+        // 🔥 CONFIGURAÇÃO DO SEU FIREBASE PRIVADO (LICITAFACIL-14133)
+        // ==============================================================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCCGkHao61duQGHBy5GDYMhog-AZ61EOd4",
+            authDomain: "licitafacil-14133.firebaseapp.com",
+            projectId: "licitafacil-14133",
+            storageBucket: "licitafacil-14133.firebasestorage.app",
+            messagingSenderId: "273857949917",
+            appId: "1:273857949917:web:8db8f1277f526c28fe2b34"
+        };
+        // ==============================================================================
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let campaigns = [];
+        let currentCampaignId = null;
+        let activeMissionStatus = [];
+        let userXP = 4250;
+        let currentActiveTab = 21;
+        let activeMission = 21;
+        let selectedCampaignIcon = 'fa-folder-open';
+
+        const DEFAULT_MISSIONS = [
+            { id: 21, title: 'DFD: A Origem', desc: 'Necessidade e Responsável', status: 'active', phase: 'Fase 1: DFD', phaseDesc: 'Documento de Formalização', tabGroup: 'dfd1' },
+            { id: 22, title: 'DFD: O Objeto', desc: 'Descrição e Quantidade', status: 'locked', phase: 'Fase 1: DFD', tabGroup: 'dfd2' },
+            { id: 23, title: 'DFD: Logística', desc: 'Valor e Prazo', status: 'locked', phase: 'Fase 1: DFD', tabGroup: 'dfd3' },
+            { id: 24, title: 'DFD: Governança', desc: 'Prioridade e Equipe', status: 'locked', phase: 'Fase 1: DFD', tabGroup: 'dfd4' },
+
+            { id: 1, title: 'ETP: Identificação', desc: 'Necessidade e Requisitos', status: 'locked', phase: 'Fase 2: ETP', phaseDesc: 'Estudo Técnico Preliminar', tabGroup: 'm1' },
+            { id: 2, title: 'ETP: Mercado', desc: 'Custos e Parcelamento', status: 'locked', phase: 'Fase 2: ETP', tabGroup: 'm2' },
+            { id: 3, title: 'ETP: Estratégia', desc: 'Resultados e Providências', status: 'locked', phase: 'Fase 2: ETP', tabGroup: 'm3' },
+            { id: 4, title: 'ETP: Viabilidade', desc: 'Solução e Parecer Final', status: 'locked', phase: 'Fase 2: ETP', tabGroup: 'm4' },
+
+            { id: 31, title: 'TR: Definição', desc: 'Especificação do Objeto', status: 'locked', phase: 'Fase 3: TR', phaseDesc: 'Termo de Referência', tabGroup: 'tr1' },
+            { id: 32, title: 'TR: Execução', desc: 'Forma e Cronograma', status: 'locked', phase: 'Fase 3: TR', tabGroup: 'tr2' },
+            { id: 33, title: 'TR: Pagamento', desc: 'Critérios e Medição', status: 'locked', phase: 'Fase 3: TR', tabGroup: 'tr3' },
+            { id: 34, title: 'TR: Seleção', desc: 'Critérios de Julgamento', status: 'locked', phase: 'Fase 3: TR', tabGroup: 'tr4' }
+        ];
+
+        const missionValidationRules = {
+            21: [{ id: 'dfd-field-just', minLength: 5 }, { id: 'dfd-field-area', minLength: 3 }],
+            22: [{ id: 'dfd-field-obj', minLength: 5 }, { id: 'dfd-field-quant', minLength: 1 }],
+            23: [{ id: 'dfd-field-valor', minLength: 2 }, { id: 'dfd-field-data', minLength: 1 }],
+            24: [{ id: 'dfd-field-prio', minLength: 1 }, { id: 'dfd-field-equipe', minLength: 5 }],
+            1: [{ id: 'field-desc', minLength: 5 }, { id: 'field-req', minLength: 5 }, { id: 'field-quant', minLength: 5 }],
+            2: [{ id: 'field-merc', minLength: 5 }, { id: 'field-cost', minLength: 5 }, { id: 'field-parc', minLength: 5 }],
+            3: [{ id: 'field-res', minLength: 5 }, { id: 'field-prov', minLength: 5 }, { id: 'field-corr', minLength: 5 }],
+            4: [{ id: 'field-sol', minLength: 5 }, { id: 'field-amb', minLength: 5 }, { id: 'field-viab', minLength: 5 }]
+        };
+
+        const guidanceData = {
+            21: { legal: "Art. 8º do Decreto 10.947/2022", tips: "Justifique por que esta contratação é necessária agora. Qual problema ela resolve?" },
+            22: { legal: "Art. 8º, II e III do Dec. 10.947/22", tips: "Use o CATMAT/CATSER. Defina a quantidade com base no consumo histórico ou projeção real." },
+            23: { legal: "Art. 8º, IV e V do Dec. 10.947/22", tips: "Estimativa preliminar pode ser baseada em painéis de preços ou contratações similares." },
+            24: { legal: "Art. 8º, VI e VII do Dec. 10.947/22", tips: "Indique a prioridade e sugira nomes técnicos para a equipe de planejamento." },
+            1: { legal: "Inciso I do § 1° do art. 18 da Lei 14.133/2021", tips: "Descreva o problema sob a perspectiva do interesse público. Quanto mais detalhes, melhor para os requisitos." },
+            2: { legal: "Inciso III do § 1° do art. 18 da Lei 14.133/2021", tips: "O que é imprescindível? Considere padrões de desempenho e qualidade." },
+            3: { legal: "Inciso IV do § 1° do art. 18 da Lei 14.133/2021", tips: "Memória de cálculo é obrigatória. Justifique como chegou nestes números." },
+            4: { legal: "Inciso V do § 1° do art. 18 da Lei 14.133/2021", tips: "Analise alternativas no mercado, inclusive locação ou processos similares." },
+            5: { legal: "Inciso VI do § 1° do art. 18 da Lei 14.133/2021", tips: "Baseie-se na IN 65/2021 para preços referenciais." },
+            6: { legal: "Inciso VIII do § 1° do art. 18 da Lei 14.133/2021", tips: "Justifique se o objeto é divisível ou não (técnica e economicamente)." },
+            7: { legal: "Inciso IX do § 1° do art. 18 da Lei 14.133/2021", tips: "Foque em eficiência, economicidade e desenvolvimento sustentável." },
+            8: { legal: "Inciso X do § 1° do art. 18 da Lei 14.133/2021", tips: "Ações necessárias antes da celebração do contrato." },
+            9: { legal: "Inciso XI do § 1° do art. 18 da Lei 14.133/2021", tips: "Verifique se há dependência de outros contratos." },
+            10: { legal: "Inciso VII do § 1° do art. 18 da Lei 14.133/2021", tips: "Descrição detalhada da solução vencedora após o estudo." },
+            11: { legal: "Inciso XII do § 1° do art. 18 da Lei 14.133/2021", tips: "Medidas de mitigação e tratamento de riscos ambientais." },
+            12: { legal: "Inciso XIII do § 1° do art. 18 da Lei 14.133/2021", tips: "Parecer final motivado sobre a viabilidade da contratação." }
+        };
+
+        const initAuth = async () => {
+            try {
+                await signInAnonymously(auth);
+            } catch (e) {
+                console.error("Auth error", e);
+                if (e.code === 'auth/configuration-not-found' || e.code === 'auth/operation-not-allowed' || e.code === 'auth/admin-restricted-operation') {
+                    const emptyState = document.getElementById('empty-state');
+                    if (emptyState) {
+                        emptyState.innerHTML = `
+                            <div class="w-20 h-20 bg-red-100 rounded-[2rem] flex items-center justify-center text-red-500 mb-6 shadow-inner">
+                                <i class="fa-solid fa-triangle-exclamation text-3xl"></i>
+                            </div>
+                            <h3 class="text-lg font-black text-slate-800 mb-2">Autenticação Desativada</h3>
+                            <p class="text-sm text-slate-500 font-medium px-4">Para iniciar, acesse seu <b>Console do Firebase > Authentication > Sign-in method</b> e ative o <b>Login Anônimo</b>.</p>
+                        `;
+                        emptyState.classList.remove('hidden');
+                        emptyState.classList.add('flex');
+                    }
+                }
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) loadCampaigns();
+        });
+
+        initAuth();
+
+        function loadCampaigns() {
+            if (!currentUser) return;
+            const campaignsRef = collection(db, 'users', currentUser.uid, 'campaigns');
+
+            onSnapshot(campaignsRef, (snapshot) => {
+                campaigns = [];
+                snapshot.forEach(doc => {
+                    campaigns.push({ id: doc.id, ...doc.data() });
+                });
+
+                campaigns.sort((a, b) => b.createdAt - a.createdAt);
+                renderCampaigns();
+            }, (error) => {
+                console.error("Error fetching campaigns: ", error);
+            });
+        }
+
+        function renderCampaigns() {
+            const list = document.getElementById('campaign-list');
+            const emptyState = document.getElementById('empty-state');
+            document.getElementById('campaignCounter').innerText = `${campaigns.length} Partidas`;
+
+            if (campaigns.length === 0) {
+                list.innerHTML = '';
+                if (!emptyState.innerHTML.includes('fa-triangle-exclamation')) {
+                    emptyState.classList.remove('hidden');
+                    emptyState.classList.add('flex');
+                }
+            } else {
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+
+                let html = '';
+                campaigns.forEach(camp => {
+                    const activePhase = camp.missions.find(m => m.status === 'active') || camp.missions[0];
+                    const phaseName = activePhase.phase.includes('DFD') ? 'DFD' : (activePhase.phase.includes('ETP') ? 'ETP' : 'TR');
+                    const badgeClass = phaseName === 'DFD' ? 'bg-emerald-100 text-emerald-700' : (phaseName === 'ETP' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700');
+
+                    html += `
+                        <div onclick="window.openMatch('${camp.id}')"
+                            class="bg-white p-5 rounded-[32px] shadow-sm border border-slate-100 tap-feedback group cursor-pointer animate-slide-up">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                    <i class="fa-solid ${camp.icon || 'fa-folder-open'} text-xl"></i>
+                                </div>
+                                <span class="text-[9px] font-bold px-2 py-1 ${badgeClass} rounded-lg">ETAPA: ${phaseName}</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-800 mb-1 leading-tight">${camp.name}</h3>
+                            <p class="text-xs text-slate-400 mb-4 font-medium">Processo Administrativo Pendente</p>
+                            <div class="flex items-center justify-between mt-4">
+                                <div class="flex-1 mr-4">
+                                    <div class="flex justify-between text-[10px] font-bold mb-1">
+                                        <span class="text-slate-400">Progresso</span>
+                                        <span class="text-blue-600">${camp.progress}%</span>
+                                    </div>
+                                    <div class="w-full h-1.5 bg-slate-100 rounded-full">
+                                        <div class="h-full bg-blue-600 rounded-full" style="width: ${camp.progress}%"></div>
+                                    </div>
+                                </div>
+                                <button class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-lg">
+                                    <i class="fa-solid fa-play text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                list.innerHTML = html;
+            }
+            updateTotalXP();
+        }
+
+        function updateTotalXP() {
+            let completedCount = 0;
+            campaigns.forEach(c => {
+                completedCount += c.missions.filter(m => m.status === 'completed').length;
+            });
+            userXP = 4250 + (completedCount * 150);
+            document.getElementById('userXPDisplay').innerText = userXP.toLocaleString('pt-BR');
+        }
+
+        window.createNewMission = function () {
+            const input = document.getElementById('newCampaignName');
+            input.value = '';
+            input.classList.remove('border-red-500');
+            window.selectIcon('fa-folder-open');
+            document.getElementById('newCampaignModal').classList.replace('hidden', 'flex');
+            setTimeout(() => input.focus(), 100);
+        };
+
+        window.closeNewCampaignModal = function () {
+            document.getElementById('newCampaignModal').classList.replace('flex', 'hidden');
+        };
+
+        window.selectIcon = function (iconClass) {
+            selectedCampaignIcon = iconClass;
+            document.querySelectorAll('.icon-btn').forEach(btn => {
+                if (btn.querySelector(`.${iconClass}`)) {
+                    btn.classList.add('border-blue-600', 'text-blue-600', 'bg-blue-50');
+                    btn.classList.remove('border-transparent', 'text-slate-400', 'bg-slate-50');
+                } else {
+                    btn.classList.remove('border-blue-600', 'text-blue-600', 'bg-blue-50');
+                    btn.classList.add('border-transparent', 'text-slate-400', 'bg-slate-50');
+                }
+            });
+        };
+
+        window.startNewCampaign = async function (event) {
+            if (!currentUser) return;
+            const input = document.getElementById('newCampaignName');
+            const campaignName = input.value.trim();
+
+            if (!campaignName) {
+                input.classList.add('border-red-500');
+                if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+                setTimeout(() => input.classList.remove('border-red-500'), 1000);
+                return;
+            }
+
+            const btn = event.currentTarget;
+            const origText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i>';
+
+            // ATUALIZAÇÃO: Criamos um campo 'responses' vazio para guardar os textos
+            const newCampaign = {
+                name: campaignName,
+                icon: selectedCampaignIcon,
+                createdAt: Date.now(),
+                progress: 0,
+                missions: JSON.parse(JSON.stringify(DEFAULT_MISSIONS)),
+                responses: {}
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, 'users', currentUser.uid, 'campaigns'), newCampaign);
+                window.closeNewCampaignModal();
+                window.openMatch(docRef.id);
+            } catch (e) {
+                console.error("Error creating campaign", e);
+            } finally {
+                btn.innerHTML = origText;
+            }
+        };
+
+        window.openMatch = function (campaignId) {
+            currentCampaignId = campaignId;
+            const camp = campaigns.find(c => c.id === campaignId);
+            if (!camp) return;
+
+            activeMissionStatus = camp.missions;
+
             const lobby = document.getElementById('lobbyView');
             const match = document.getElementById('matchView');
-            const matchTitle = document.getElementById('currentMatchTitle');
 
-            if (!lobby || !match || !matchTitle) return;
+            document.getElementById('header-user-info').classList.replace('flex', 'hidden');
+            document.getElementById('header-actions').classList.replace('flex', 'hidden');
+            document.getElementById('header-match-info').classList.replace('hidden', 'flex');
 
-            matchTitle.innerText = title;
+            document.getElementById('currentMatchTitle').innerText = camp.name;
+
+            // ATUALIZAÇÃO: Limpar formulários primeiro, para não mostrar dados da licitação anterior
+            document.querySelectorAll('input, textarea, select').forEach(el => {
+                if (el.id && el.id !== 'newCampaignName') el.value = '';
+            });
+
+            // ATUALIZAÇÃO: Preencher formulários com os dados salvos nesta licitação
+            if (camp.responses) {
+                for (const [fieldId, savedValue] of Object.entries(camp.responses)) {
+                    const el = document.getElementById(fieldId);
+                    if (el) el.value = savedValue;
+                }
+            }
 
             lobby.classList.replace('active-content', 'hidden-content');
             setTimeout(() => {
                 match.classList.replace('hidden-content', 'active-content');
-                // Deixa o renderTimeline cuidar do progresso real
                 renderTimeline();
             }, 150);
-        }
+        };
 
-        function closeMatch() {
+        window.closeMatch = function () {
+            currentCampaignId = null;
             const lobby = document.getElementById('lobbyView');
             const match = document.getElementById('matchView');
 
-            if (!lobby || !match) return;
+            document.getElementById('header-match-info').classList.replace('flex', 'hidden');
+            document.getElementById('header-user-info').classList.replace('hidden', 'flex');
+            document.getElementById('header-actions').classList.replace('hidden', 'flex');
 
             match.classList.replace('active-content', 'hidden-content');
             setTimeout(() => {
                 lobby.classList.replace('hidden-content', 'active-content');
             }, 150);
-        }
-
-        function closeMissionForm() {
-            document.getElementById('missionFormModal').classList.add('hidden');
-        }
-
-        let missionStatus = [
-            // FASE 1: DFD (IDs 21-24)
-            { id: 21, title: 'DFD: A Origem', desc: 'Necessidade e Responsável', status: 'completed', phase: 'Fase 1: DFD', phaseDesc: 'Documento de Formalização' },
-            { id: 22, title: 'DFD: O Objeto', desc: 'Descrição e Quantidade', status: 'completed', phase: 'Fase 1: DFD' },
-            { id: 23, title: 'DFD: Logística', desc: 'Valor e Prazo', status: 'completed', phase: 'Fase 1: DFD' },
-            { id: 24, title: 'DFD: Governança', desc: 'Prioridade e Equipe', status: 'completed', phase: 'Fase 1: DFD' },
-            // FASE 2: ETP (IDs 1-4)
-            { id: 1, title: 'ETP: Identificação', desc: 'Necessidade e Requisitos', status: 'completed', phase: 'Fase 2: ETP', phaseDesc: 'Estudo Técnico Preliminar' },
-            { id: 2, title: 'ETP: Mercado', desc: 'Custos e Parcelamento', status: 'completed', phase: 'Fase 2: ETP' },
-            { id: 3, title: 'ETP: Estratégia', desc: 'Resultados e Providências', status: 'completed', phase: 'Fase 2: ETP' },
-            { id: 4, title: 'ETP: Viabilidade', desc: 'Solução e Parecer Final', status: 'completed', phase: 'Fase 2: ETP' },
-            // FASE 3: TR (IDs 31-34 - Placeholder)
-            { id: 31, title: 'TR: Definição', desc: 'Especificação do Objeto', status: 'completed', phase: 'Fase 3: TR', phaseDesc: 'Termo de Referência' },
-            { id: 32, title: 'TR: Execução', desc: 'Forma e Cronograma', status: 'completed', phase: 'Fase 3: TR' },
-            { id: 33, title: 'TR: Pagamento', desc: 'Critérios e Medição', status: 'completed', phase: 'Fase 3: TR' },
-            { id: 34, title: 'TR: Seleção', desc: 'Critérios de Julgamento', status: 'completed', phase: 'Fase 3: TR' }
-        ];
+        };
 
         function renderTimeline() {
             const container = document.getElementById('etp-timeline-phase');
             let html = '';
-            
             const groupedMissions = {};
-            missionStatus.forEach(m => {
+
+            activeMissionStatus.forEach(m => {
                 if (!groupedMissions[m.phase]) groupedMissions[m.phase] = { desc: m.phaseDesc, missions: [] };
                 groupedMissions[m.phase].missions.push(m);
             });
@@ -702,36 +1054,22 @@
                 const phase = groupedMissions[phaseTitle];
                 const progress = calculatePhaseProgress(phase.missions);
                 const isLocked = phase.missions.every(m => m.status === 'locked');
-                
-                // Cores e Ícones específicos por fase
+
                 let phaseColor, trackColor, bgClass, textClass, badgeClass, btnClass, phaseIcon;
+
                 if (phaseTitle.includes('Fase 1')) {
-                    phaseColor = '#10b981'; trackColor = '#d1fae5';
-                    bgClass = 'bg-emerald-500'; textClass = 'text-emerald-600';
-                    badgeClass = 'bg-emerald-50 text-emerald-600';
-                    btnClass = 'bg-emerald-600 shadow-[0_8px_25px_-5px_rgba(16,185,129,0.4)]';
-                    phaseIcon = 'fa-file-contract';
+                    phaseColor = '#10b981'; trackColor = '#d1fae5'; bgClass = 'bg-emerald-500'; textClass = 'text-emerald-600'; badgeClass = 'bg-emerald-50 text-emerald-600'; btnClass = 'bg-emerald-600 shadow-[0_8px_25px_-5px_rgba(16,185,129,0.4)]'; phaseIcon = 'fa-file-contract';
                 } else if (phaseTitle.includes('Fase 2')) {
-                    phaseColor = '#2563eb'; trackColor = '#dbeafe';
-                    bgClass = 'bg-blue-600'; textClass = 'text-blue-600';
-                    badgeClass = 'bg-blue-50 text-blue-600';
-                    btnClass = 'bg-blue-600 shadow-[0_8px_25px_-5px_rgba(37,99,235,0.4)]';
-                    phaseIcon = 'fa-pen-nib';
+                    phaseColor = '#2563eb'; trackColor = '#dbeafe'; bgClass = 'bg-blue-600'; textClass = 'text-blue-600'; badgeClass = 'bg-blue-50 text-blue-600'; btnClass = 'bg-blue-600 shadow-[0_8px_25px_-5px_rgba(37,99,235,0.4)]'; phaseIcon = 'fa-pen-nib';
                 } else {
-                    phaseColor = '#f59e0b'; trackColor = '#fef3c7';
-                    bgClass = 'bg-amber-500'; textClass = 'text-amber-600';
-                    badgeClass = 'bg-amber-50 text-amber-600';
-                    btnClass = 'bg-amber-600 shadow-[0_8px_25px_-5px_rgba(245,158,11,0.4)]';
-                    phaseIcon = 'fa-gavel';
+                    phaseColor = '#f59e0b'; trackColor = '#fef3c7'; bgClass = 'bg-amber-500'; textClass = 'text-amber-600'; badgeClass = 'bg-amber-50 text-amber-600'; btnClass = 'bg-amber-600 shadow-[0_8px_25px_-5px_rgba(245,158,11,0.4)]'; phaseIcon = 'fa-gavel';
                 }
 
                 html += `
                     <div class="phase-row relative flex items-start ${isLocked ? 'opacity-40 grayscale' : ''}">
-                        <!-- LINHA SEGMENTADA (Exclusiva desta fase) -->
                         <div class="phase-track" style="background-color: ${trackColor};">
                             <div class="phase-track-progress" style="background-color: ${phaseColor}; height: ${progress}%;"></div>
                         </div>
-
                         <div class="progress-circle shadow-md shrink-0" style="--percent: ${progress}%; --progress-color: ${phaseColor};">
                             <div class="w-9 h-9 rounded-full ${progress === 100 ? bgClass : (isLocked ? 'bg-slate-200' : bgClass)} text-white flex items-center justify-center z-10 transition-colors duration-500">
                                 <i class="fa-solid ${progress === 100 ? 'fa-check' : (isLocked ? 'fa-lock' : phaseIcon)} text-xs"></i>
@@ -753,10 +1091,7 @@
                                     <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
                                 </div>
                                 <h5 class="text-[10px] font-bold text-slate-600 mb-3">${m.desc}</h5>
-                                <button onclick="playMission(${m.id})"
-                                    class="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-500 text-[8px] font-black rounded-lg tap-feedback uppercase border border-slate-100 dark:border-white/5">
-                                    Revisar Missão
-                                </button>
+                                <button onclick="window.playMission(${m.id})" class="w-full py-2 bg-slate-50 text-slate-500 text-[8px] font-black rounded-lg tap-feedback uppercase border border-slate-100">Revisar Missão</button>
                             </div>
                         `;
                     } else if (m.status === 'active') {
@@ -770,10 +1105,7 @@
                                     <span class="text-[8px] font-black ${badgeClass} px-2 py-0.5 rounded-full uppercase">Em Jogo</span>
                                 </div>
                                 <h5 class="text-[10px] font-bold text-slate-800 mb-3">${m.desc}</h5>
-                                <button onclick="playMission(${m.id})"
-                                    class="w-full py-2.5 ${btnClass} text-white text-[9px] font-black rounded-xl tap-feedback uppercase tracking-widest">
-                                    Iniciar Missão
-                                </button>
+                                <button onclick="window.playMission(${m.id})" class="w-full py-2.5 ${btnClass} text-white text-[9px] font-black rounded-xl tap-feedback uppercase tracking-widest">Iniciar Missão</button>
                             </div>
                         `;
                     } else {
@@ -788,10 +1120,8 @@
                         `;
                     }
                 });
-
                 html += `</div></div>`;
             }
-
             container.innerHTML = html;
         }
 
@@ -800,134 +1130,66 @@
             return (completed / missions.length) * 100;
         }
 
-        const guidanceData = {
-            21: { legal: "Art. 8º do Decreto 10.947/2022", tips: "Justifique por que esta contratação é necessária agora. Qual problema ela resolve?" },
-            22: { legal: "Art. 8º, II e III do Dec. 10.947/22", tips: "Use o CATMAT/CATSER. Defina a quantidade com base no consumo histórico ou projeção real." },
-            23: { legal: "Art. 8º, IV e V do Dec. 10.947/22", tips: "Estimativa preliminar pode ser baseada em painéis de preços ou contratações similares." },
-            24: { legal: "Art. 8º, VI e VII do Dec. 10.947/22", tips: "Indique a prioridade e sugira nomes técnicos para a equipe de planejamento." },
-            1: { legal: "Inciso I do § 1° do art. 18 da Lei 14.133/2021", tips: "Descreva o problema sob a perspectiva do interesse público. Quanto mais detalhes, melhor para os requisitos." },
-            2: { legal: "Inciso III do § 1° do art. 18 da Lei 14.133/2021", tips: "O que é imprescindível? Considere padrões de desempenho e qualidade." },
-            3: { legal: "Inciso IV do § 1° do art. 18 da Lei 14.133/2021", tips: "Memória de cálculo é obrigatória. Justifique como chegou nestes números." },
-            4: { legal: "Inciso V do § 1° do art. 18 da Lei 14.133/2021", tips: "Analise alternativas no mercado, inclusive locação ou processos similares." },
-            5: { legal: "Inciso VI do § 1° do art. 18 da Lei 14.133/2021", tips: "Baseie-se na IN 65/2021 para preços referenciais." },
-            6: { legal: "Inciso VIII do § 1° do art. 18 da Lei 14.133/2021", tips: "Justifique se o objeto é divisível ou não (técnica e economicamente)." },
-            7: { legal: "Inciso IX do § 1° do art. 18 da Lei 14.133/2021", tips: "Foque em eficiência, economicidade e desenvolvimento sustentável." },
-            8: { legal: "Inciso X do § 1° do art. 18 da Lei 14.133/2021", tips: "Ações necessárias antes da celebração do contrato." },
-            9: { legal: "Inciso XI do § 1° do art. 18 da Lei 14.133/2021", tips: "Verifique se há dependência de outros contratos." },
-            10: { legal: "Inciso VII do § 1° do art. 18 da Lei 14.133/2021", tips: "Descrição detalhada da solução vencedora após o estudo." },
-            11: { legal: "Inciso XII do § 1° do art. 18 da Lei 14.133/2021", tips: "Medidas de mitigação e tratamento de riscos ambientais." },
-            12: { legal: "Inciso XIII do § 1° do art. 18 da Lei 14.133/2021", tips: "Parecer final motivado sobre a viabilidade da contratação." }
+        window.playMission = function (missionId) {
+            activeMission = missionId;
+            const missionData = activeMissionStatus.find(m => m.id === missionId);
+            if (!missionData) return;
+
+            const isDFD = missionData.phase.includes('DFD');
+            document.getElementById('form-header-phase').innerText = isDFD ? 'Documento de Formalização' : 'Estudo Técnico Preliminar';
+
+            document.querySelectorAll('.mission-tab, .tab-content').forEach(el => el.classList.add('hidden'));
+
+            const activeGroup = missionData.tabGroup;
+            document.querySelectorAll(`.mission-tab[data-group="${activeGroup}"], .tab-content[data-group="${activeGroup}"]`).forEach(el => el.classList.remove('hidden'));
+
+            const firstAvailableTabBtn = document.querySelector(`.mission-tab[data-group="${activeGroup}"]:not(.hidden)`);
+            if (firstAvailableTabBtn) {
+                const startTab = parseInt(firstAvailableTabBtn.id.split('-')[1]);
+                window.switchTab(startTab);
+            }
+
+            document.getElementById('missionFormModal').classList.remove('hidden');
+            window.checkFormCompletion();
         };
 
-        let currentActiveTab = 21;
-        let activeMission = 21;
-
-        function switchTab(tabNumber) {
+        window.switchTab = function (tabNumber) {
             currentActiveTab = tabNumber;
-            // Esconde todos os conteúdos
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
-            // Remove active de todos os botões
+            document.querySelectorAll('.tab-content:not(.hidden)').forEach(content => content.classList.add('hidden'));
+
             document.querySelectorAll('.mission-tab').forEach(btn => {
                 btn.classList.remove('text-blue-600', 'border-blue-600');
                 btn.classList.add('text-slate-400', 'border-transparent');
             });
 
-            // Mostra o atual
             const content = document.getElementById(`mission-tab-${tabNumber}`);
             if (content) content.classList.remove('hidden');
-            
+
             const activeBtn = document.getElementById(`tab-${tabNumber}-btn`);
             if (activeBtn) {
                 activeBtn.classList.add('text-blue-600', 'border-blue-600');
                 activeBtn.classList.remove('text-slate-400', 'border-transparent');
                 activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
             }
-        }
+        };
 
-        function toggleGuidance() {
-            const overlay = document.getElementById('guidanceOverlay');
-            if (overlay.classList.contains('hidden')) {
-                const data = guidanceData[currentActiveTab] || { legal: "Fundamentação Legal", tips: "Preencha todos os campos obrigatórios (*) para concluir." };
-                document.getElementById('guidance-legal').innerText = data.legal;
-                document.getElementById('guidance-tips').innerText = data.tips;
-                overlay.classList.replace('hidden', 'flex');
-            } else {
-                overlay.classList.replace('flex', 'hidden');
-            }
-        }
+        window.closeMissionForm = function () {
+            document.getElementById('missionFormModal').classList.add('hidden');
+        };
 
-        function playMission(missionId = 21) {
-            activeMission = missionId;
-            document.getElementById('missionFormModal').classList.remove('hidden');
-            
-            // Título dinâmico do Header
-            const isDFD = missionId >= 21 && missionId <= 24;
-            document.getElementById('form-header-phase').innerText = isDFD ? 'Documento de Formalização' : 'Estudo Técnico Preliminar';
-
-            // Gerencia abas de DFD
-            document.querySelectorAll('.dfd1-tab, .dfd1-content').forEach(el => missionId === 21 ? el.classList.remove('hidden') : el.classList.add('hidden'));
-            document.querySelectorAll('.dfd2-tab, .dfd2-content').forEach(el => missionId === 22 ? el.classList.remove('hidden') : el.classList.add('hidden'));
-            document.querySelectorAll('.dfd3-tab, .dfd3-content').forEach(el => missionId === 23 ? el.classList.remove('hidden') : el.classList.add('hidden'));
-            document.querySelectorAll('.dfd4-tab, .dfd4-content').forEach(el => missionId === 24 ? el.classList.remove('hidden') : el.classList.add('hidden'));
-
-            // Gerencia abas de ETP
-            document.querySelectorAll('.m1-tab, .m1-content').forEach(el => missionId === 1 ? el.classList.remove('hidden') : el.classList.add('hidden'));
-            document.querySelectorAll('.m2-tab, .m2-content').forEach(el => missionId === 2 ? el.classList.remove('hidden') : el.classList.add('hidden'));
-            document.querySelectorAll('.m3-tab, .m3-content').forEach(el => missionId === 3 ? el.classList.remove('hidden') : el.classList.add('hidden'));
-            document.querySelectorAll('.m4-tab, .m4-content').forEach(el => missionId === 4 ? el.classList.remove('hidden') : el.classList.add('hidden'));
-
-            // Start Tab
-            let startTab = missionId;
-            if (missionId === 21) startTab = 21;
-            if (missionId === 22) startTab = 23;
-            if (missionId === 23) startTab = 25;
-            if (missionId === 24) startTab = 27;
-            
-            switchTab(startTab);
-            checkFormCompletion();
-        }
-
-        function checkFormCompletion() {
+        window.checkFormCompletion = function () {
             let isComplete = false;
-            
-            if (activeMission === 21) {
-                const just = document.getElementById('dfd-field-just').value.trim();
-                const area = document.getElementById('dfd-field-area').value.trim();
-                isComplete = just.length > 5 && area.length > 3;
-            } else if (activeMission === 22) {
-                const obj = document.getElementById('dfd-field-obj').value.trim();
-                const quant = document.getElementById('dfd-field-quant').value.trim();
-                isComplete = obj.length > 5 && quant.length > 1;
-            } else if (activeMission === 23) {
-                const valor = document.getElementById('dfd-field-valor').value.trim();
-                const data = document.getElementById('dfd-field-data').value;
-                isComplete = valor.length > 2 && data !== '';
-            } else if (activeMission === 24) {
-                const prio = document.getElementById('dfd-field-prio').value;
-                const equipe = document.getElementById('dfd-field-equipe').value.trim();
-                isComplete = prio !== '' && equipe.length > 5;
-            } else if (activeMission === 1) {
-                const desc = document.getElementById('field-desc').value.trim();
-                const req = document.getElementById('field-req').value.trim();
-                const quant = document.getElementById('field-quant').value.trim();
-                isComplete = desc.length > 5 && req.length > 5 && quant.length > 5;
-            } else if (activeMission === 2) {
-                const merc = document.getElementById('field-merc').value.trim();
-                const cost = document.getElementById('field-cost').value.trim();
-                const parc = document.getElementById('field-parc').value.trim();
-                isComplete = merc.length > 5 && cost.length > 5 && parc.length > 5;
-            } else if (activeMission === 3) {
-                const res = document.getElementById('field-res').value.trim();
-                const prov = document.getElementById('field-prov').value.trim();
-                const corr = document.getElementById('field-corr').value.trim();
-                isComplete = res.length > 5 && prov.length > 5 && corr.length > 5;
-            } else if (activeMission === 4) {
-                const sol = document.getElementById('field-sol').value.trim();
-                const amb = document.getElementById('field-amb').value.trim();
-                const viab = document.getElementById('field-viab').value.trim();
-                isComplete = sol.length > 5 && amb.length > 5 && viab.length > 5;
+            const rules = missionValidationRules[activeMission];
+
+            if (rules) {
+                isComplete = rules.every(rule => {
+                    const el = document.getElementById(rule.id);
+                    return el && el.value.trim().length >= rule.minLength;
+                });
+            } else {
+                isComplete = true;
             }
-            
+
             const btn = document.getElementById('finish-mission-btn');
             const badge = document.getElementById('mission-badge');
 
@@ -948,104 +1210,125 @@
                 badge.innerHTML = '<i class="fa-solid fa-scroll"></i>';
                 badge.classList.remove('animate-bounce');
             }
+        };
+
+        window.toggleGuidance = function () {
+            const overlay = document.getElementById('guidanceOverlay');
+            if (overlay.classList.contains('hidden')) {
+                const data = guidanceData[currentActiveTab] || { legal: "Fundamentação Legal", tips: "Preencha todos os campos obrigatórios (*) para concluir." };
+                document.getElementById('guidance-legal').innerText = data.legal;
+                document.getElementById('guidance-tips').innerText = data.tips;
+                overlay.classList.replace('hidden', 'flex');
+            } else {
+                overlay.classList.replace('flex', 'hidden');
+            }
+        };
+
+        // ATUALIZAÇÃO: Função auxiliar para capturar os dados digitados na tela atual
+        function collectCurrentMissionData() {
+            let data = {};
+            const rules = missionValidationRules[activeMission];
+            if (rules) {
+                rules.forEach(rule => {
+                    const el = document.getElementById(rule.id);
+                    if (el) data[rule.id] = el.value; // Pega o que você digitou
+                });
+            }
+            return data;
         }
 
-        function toggleMissionTools() {
-            const menu = document.getElementById('mission-tools-menu');
-            menu.classList.toggle('hidden');
-        }
+        // ATUALIZAÇÃO: Botão "Salvar" agora realmente empurra os dados para o Firebase
+        window.saveProgress = async function (event) {
+            if (!currentUser || !currentCampaignId) return;
 
-        function saveProgress() {
-            const btn = event.currentTarget;
-            const icon = btn.querySelector('i');
-            const span = btn.querySelector('span');
-            
-            icon.className = 'fa-solid fa-cloud-arrow-up animate-pulse text-blue-600';
-            
-            setTimeout(() => {
-                icon.className = 'fa-solid fa-circle-check text-emerald-500';
+            // Controle visual do botão
+            const btn = event ? event.currentTarget : document.querySelector('button[onclick="saveProgress()"]');
+            const icon = btn ? btn.querySelector('i') : null;
+            if (icon) icon.className = 'fa-solid fa-cloud-arrow-up animate-pulse text-blue-600';
+
+            // Coleta os dados que estão na tela agora
+            const newData = collectCurrentMissionData();
+
+            try {
+                // Junta os dados novos com as respostas antigas daquela licitação
+                const camp = campaigns.find(c => c.id === currentCampaignId);
+                const updatedResponses = { ...(camp ? camp.responses : {}), ...newData };
+
+                // Envia para o Firebase (só o conteúdo, sem mudar a missão de fase)
+                await updateDoc(doc(db, 'users', currentUser.uid, 'campaigns', currentCampaignId), {
+                    responses: updatedResponses
+                });
+
                 if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
-                
-                setTimeout(() => {
-                    icon.className = 'fa-solid fa-cloud-arrow-up text-xl';
-                    icon.classList.remove('text-emerald-500');
-                }, 1500);
-            }, 1000);
-        }
+                if (icon) icon.className = 'fa-solid fa-circle-check text-emerald-500';
+                setTimeout(() => { if (icon) icon.className = 'fa-solid fa-cloud-arrow-up text-xl'; }, 1500);
+            } catch (e) {
+                console.error("Erro ao salvar dados no Firebase", e);
+            }
+        };
 
-        function finishMission() {
+        window.finishMission = async function (event) {
+            if (!currentUser || !currentCampaignId) return;
+
             const btn = event.currentTarget;
             const icon = btn.querySelector('i');
             icon.className = 'fa-solid fa-spinner animate-spin text-blue-600';
-            
-            setTimeout(() => {
-                const currentIdx = missionStatus.findIndex(m => m.id === activeMission);
-                missionStatus[currentIdx].status = 'completed';
-                
-                if (currentIdx < missionStatus.length - 1) {
-                    missionStatus[currentIdx + 1].status = 'active';
+
+            // Avança o status das missões (como já fazia)
+            const currentIdx = activeMissionStatus.findIndex(m => m.id === activeMission);
+            if (currentIdx !== -1) {
+                activeMissionStatus[currentIdx].status = 'completed';
+                if (currentIdx < activeMissionStatus.length - 1) {
+                    activeMissionStatus[currentIdx + 1].status = 'active';
                 }
+            }
 
-                closeMissionForm();
+            const totalCompleted = activeMissionStatus.filter(m => m.status === 'completed').length;
+            const newProgress = Math.round((totalCompleted / activeMissionStatus.length) * 100);
+
+            // ATUALIZAÇÃO: Também coleta os dados ao concluir a missão!
+            const newData = collectCurrentMissionData();
+            const camp = campaigns.find(c => c.id === currentCampaignId);
+            const updatedResponses = { ...(camp ? camp.responses : {}), ...newData };
+
+            try {
+                // Atualiza progresso e as respostas em uma tacada só
+                await updateDoc(doc(db, 'users', currentUser.uid, 'campaigns', currentCampaignId), {
+                    missions: activeMissionStatus,
+                    progress: newProgress,
+                    responses: updatedResponses
+                });
+
+                window.closeMissionForm();
                 renderTimeline();
-                showMissionSuccess();
-                icon.className = 'fa-solid fa-flag-checkered text-lg';
-            }, 800);
-        }
+                window.showMissionSuccess();
+            } catch (error) {
+                console.error("Erro ao salvar missão", error);
+            } finally {
+                icon.className = 'fa-solid fa-circle-check text-xl';
+            }
+        };
 
-        function showMissionSuccess() {
+        window.showMissionSuccess = function () {
             const modal = document.getElementById('successModal');
             modal.classList.remove('hidden');
-            
+
             const duration = 3 * 1000;
             const end = Date.now() + duration;
 
             (function frame() {
-                confetti({
-                    particleCount: 3,
-                    angle: 60, spread: 55, origin: { x: 0 },
-                    colors: ['#2563eb', '#10b981', '#fbbf24']
-                });
-                confetti({
-                    particleCount: 3,
-                    angle: 120, spread: 55, origin: { x: 1 },
-                    colors: ['#2563eb', '#10b981', '#fbbf24']
-                });
+                confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#2563eb', '#10b981', '#fbbf24'] });
+                confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#2563eb', '#10b981', '#fbbf24'] });
                 if (Date.now() < end) requestAnimationFrame(frame);
             }());
+        };
 
-            updateXP(150);
-        }
-
-        function updateXP(amount) {
-            const xpDisplay = document.querySelector('#topStatsBoard p.text-sm.font-black');
-            const startXP = 4250; // Mock base
-            const newXP = startXP + amount;
-            
-            let current = startXP;
-            const step = amount / 20;
-            const timer = setInterval(() => {
-                current += step;
-                if (current >= newXP) {
-                    xpDisplay.innerText = newXP.toLocaleString();
-                    clearInterval(timer);
-                } else {
-                    xpDisplay.innerText = Math.floor(current).toLocaleString();
-                }
-            }, 30);
-        }
-
-        function closeSuccessModal() {
+        window.closeSuccessModal = function () {
             document.getElementById('successModal').classList.add('hidden');
-        }
-
-        function createNewMission() {
-            openMatch('Nova Contratação #2024');
-        }
+        };
 
         window.onload = () => {
-            renderTimeline();
-            console.log("14133 Fácil - Lobby Premium Iniciado.");
+            document.getElementById('userXPDisplay').innerText = userXP.toLocaleString('pt-BR');
         };
     </script>
 </body>
