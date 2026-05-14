@@ -18,6 +18,7 @@ html {
     background-color: #000000; /* Fundo oficial para vácuo premium */
 }
 
+html,
 body {
     height: 100dvh;
     min-height: -webkit-fill-available;
@@ -26,6 +27,7 @@ body {
     width: 100%;
     overflow: hidden;
     background-color: var(--app-bg);
+    overscroll-behavior: none; /* Desativa pull-to-refresh */
 }
 
 #scroll-container {
