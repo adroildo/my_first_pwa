@@ -261,6 +261,44 @@ function takePhoto() {
     }, 500);
 }
 
+// Lógica de Check-in (GPS)
+function handleCheckIn() {
+    if (!navigator.geolocation) {
+        showAlert("Seu navegador não suporta GPS.", "fa-triangle-exclamation");
+        return;
+    }
+
+    showAlert("Obtendo localização...", "fa-location-crosshairs");
+    closeQuickMenu();
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            
+            console.log(`Localização: ${lat}, ${lng}`);
+            
+            // Cria um link para o Google Maps
+            const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+            
+            // Mostra o resultado com um botão de ação no alerta (simulado via mensagem)
+            setTimeout(() => {
+                showAlert(`Check-in realizado! Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`, "fa-location-dot");
+                
+                // Opcional: Abrir o mapa automaticamente após 1.5s
+                // window.open(mapsUrl, '_blank');
+            }, 1000);
+        },
+        (error) => {
+            console.error("Erro GPS:", error);
+            let msg = "Não foi possível obter sua localização.";
+            if (error.code === 1) msg = "Permissão de GPS negada.";
+            showAlert(msg, "fa-triangle-exclamation");
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+    );
+}
+
 function handleLogin() {
     const user = document.getElementById('login-user').value;
     const pass = document.getElementById('login-pass').value;
