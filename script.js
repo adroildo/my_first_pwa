@@ -262,6 +262,8 @@ function takePhoto() {
 }
 
 // Lógica de Check-in (GPS)
+let leafletMap = null;
+
 function handleCheckIn() {
     if (!navigator.geolocation) {
         showAlert("Seu navegador não suporta GPS.", "fa-triangle-exclamation");
@@ -276,17 +278,13 @@ function handleCheckIn() {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
             
+            // Salva no histórico
+            saveLocation(lat, lng);
+            
             console.log(`Localização: ${lat}, ${lng}`);
             
-            // Cria um link para o Google Maps
-            const mapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-            
-            // Mostra o resultado com um botão de ação no alerta (simulado via mensagem)
             setTimeout(() => {
-                showAlert(`Check-in realizado! Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`, "fa-location-dot");
-                
-                // Opcional: Abrir o mapa automaticamente após 1.5s
-                // window.open(mapsUrl, '_blank');
+                showAlert(`Check-in realizado! Local salvo no mapa.`, "fa-location-dot");
             }, 1000);
         },
         (error) => {
@@ -297,6 +295,71 @@ function handleCheckIn() {
         },
         { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     );
+}
+
+function saveLocation(lat, lng) {
+    let history = JSON.parse(localStorage.getItem('checkin_history') || '[]');
+    history.push({
+        lat,
+        lng,
+        date: new Date().toLocaleString('pt-BR')
+    });
+    localStorage.setItem('checkin_history', JSON.stringify(history));
+}
+
+function openMapModal() {
+    const modal = document.getElementById('map-modal');
+    modal.classList.remove('hidden');
+    closeQuickMenu();
+
+    // Inicializa o mapa Leaflet
+    setTimeout(() => {
+        if (!leafletMap) {
+            leafletMap = L.map('map').setView([0, 0], 2);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(leafletMap);
+        }
+        renderMarkers();
+    }, 100);
+}
+
+function renderMarkers() {
+    if (!leafletMap) return;
+
+    // Limpa marcadores existentes (opcional, ou apenas adiciona os novos)
+    const history = JSON.parse(localStorage.getItem('checkin_history') || '[]');
+    
+    if (history.length > 0) {
+        const bounds = [];
+        history.forEach(loc => {
+            L.marker([loc.lat, loc.lng])
+                .addTo(leafletMap)
+                .bindPopup(`<b>Check-in</b><br>${loc.date}`);
+            bounds.push([loc.lat, loc.lng]);
+        });
+        
+        // Ajusta o zoom para mostrar todos os pontos
+        leafletMap.fitBounds(bounds, { padding: [50, 50] });
+    }
+}
+
+function closeMapModal() {
+    document.getElementById('map-modal').classList.add('hidden');
+}
+
+function clearCheckInHistory() {
+    if (confirm("Deseja realmente apagar todo o histórico de locais?")) {
+        localStorage.removeItem('checkin_history');
+        if (leafletMap) {
+            leafletMap.eachLayer((layer) => {
+                if (layer instanceof L.Marker) {
+                    leafletMap.removeLayer(layer);
+                }
+            });
+        }
+        showAlert("Histórico limpo!", "fa-trash-can");
+    }
 }
 
 function handleLogin() {

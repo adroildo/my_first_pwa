@@ -18,6 +18,10 @@
     <meta name="apple-mobile-web-app-title" content="AppPremium">
     <link rel="apple-touch-icon" href="icon-512.png">
 
+    <!-- Leaflet Maps CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
     <!-- Styles & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -437,11 +441,11 @@
 
             <!-- PÁGINA 2 (Escondida) -->
             <div id="quick-page-2" class="hidden grid grid-cols-3 gap-4 transition-all duration-300">
-                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                <button onclick="openMapModal()" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
                     <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-calendar-days"></i>
+                        <i class="fa-solid fa-map-location-dot"></i>
                     </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Agenda</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Ver Mapa</span>
                 </button>
                 <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
                     <div class="w-14 h-14 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center text-xl">
@@ -534,6 +538,27 @@
 
         <!-- Feedback de Captura (Flash) -->
         <div id="camera-flash" class="fixed inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-100"></div>
+    </div>
+
+    <!-- Modal de Mapa Histórico -->
+    <div id="map-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[110] hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg h-[80vh] rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl animate-bounce-in">
+            <div class="p-6 flex justify-between items-center border-b border-slate-50">
+                <h2 class="text-xl font-black text-slate-800">Histórico de Locais</h2>
+                <button onclick="closeMapModal()" class="w-10 h-10 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center active:scale-90 transition-transform">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <!-- Container do Mapa -->
+            <div id="map" class="flex-1 w-full bg-slate-50"></div>
+
+            <div class="p-6 bg-slate-50">
+                <button onclick="clearCheckInHistory()" class="w-full py-3 text-xs font-bold text-red-500 uppercase tracking-widest active:scale-95 transition-transform">
+                    <i class="fa-solid fa-trash-can mr-2"></i>Limpar Histórico
+                </button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
