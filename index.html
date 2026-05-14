@@ -730,26 +730,21 @@
     <div id="quiz-modal" class="fixed inset-0 bg-slate-50 dark:bg-slate-950 z-[150] hidden flex flex-col overflow-hidden">
         
         <!-- Header: Stats & Progress -->
-        <div class="bg-white dark:bg-slate-900 shadow-sm flex flex-col">
-            <div class="px-6 h-[60px] flex justify-between items-center">
-                <button onclick="closeQuiz()" class="text-slate-400 active:scale-90 transition-transform">
+        <div class="bg-white dark:bg-slate-900 shadow-sm">
+            <div class="px-6 h-[60px] flex items-center space-x-4">
+                <button onclick="closeQuiz()" class="text-slate-400 active:scale-90 transition-transform flex-shrink-0">
                     <i class="fa-solid fa-chevron-left text-xl"></i>
                 </button>
-                <div class="flex items-center space-x-6">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-heart text-rose-500 text-sm"></i>
-                        <span id="quiz-lives" class="text-sm font-bold text-slate-700 dark:text-slate-200">3</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-coins text-amber-500 text-sm"></i>
-                        <span id="quiz-coins" class="text-sm font-bold text-slate-700 dark:text-slate-200">120</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="px-6 pb-3">
-                <div class="h-1 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                
+                <!-- Barra de Progresso -->
+                <div class="flex-1 h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
                     <div id="quiz-progress" class="h-full bg-indigo-500 w-0 transition-all duration-500"></div>
+                </div>
+
+                <!-- Vidas -->
+                <div class="flex items-center space-x-2 flex-shrink-0">
+                    <i class="fa-solid fa-heart text-rose-500 text-sm"></i>
+                    <span id="quiz-lives" class="text-sm font-bold text-slate-700 dark:text-slate-200">3</span>
                 </div>
             </div>
         </div>

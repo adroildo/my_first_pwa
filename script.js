@@ -980,7 +980,6 @@ function closeQuiz() {
 
 function updateQuizStats() {
     document.getElementById('quiz-lives').innerText = quizLives;
-    document.getElementById('quiz-coins').innerText = quizCoins;
 }
 
 function updateQuizUI() {
