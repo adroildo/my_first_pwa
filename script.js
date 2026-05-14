@@ -162,13 +162,13 @@ function renderPosts() {
     // Se não houver posts, mostra alguns placeholders
     if (posts.length === 0) {
         posts = [
-            { content: "Bem-vindo ao seu novo feed dinâmico!", author: "Sistema", date: "Há 1 min", icon: "fa-rocket", color: "emerald" },
-            { content: "Explore as funcionalidades do Menu Rápido.", author: "Guia", date: "Há 5 min", icon: "fa-lightbulb", color: "amber" }
+            { id: 1, content: "Bem-vindo ao seu novo feed dinâmico!", author: "Sistema", date: "Há 1 min", icon: "fa-rocket", color: "emerald" },
+            { id: 2, content: "Explore as funcionalidades do Menu Rápido.", author: "Guia", date: "Há 5 min", icon: "fa-lightbulb", color: "amber" }
         ];
     }
 
     const postsHtml = posts.map(post => `
-        <div class="card p-4 rounded-3xl flex items-center space-x-4 animate-fade-in">
+        <div onclick="openViewPostModal(${post.id})" class="card p-4 rounded-3xl flex items-center space-x-4 animate-fade-in active:bg-slate-50 transition-colors cursor-pointer">
             <div class="w-12 h-12 bg-${post.color || 'slate'}-100 rounded-2xl flex items-center justify-center text-${post.color || 'slate'}-500">
                 <i class="fa-solid ${post.icon || 'fa-image'}"></i>
             </div>
@@ -181,6 +181,43 @@ function renderPosts() {
     `).join('');
 
     container.innerHTML = header + postsHtml;
+}
+
+function openViewPostModal(postId) {
+    const posts = JSON.parse(localStorage.getItem('user_posts') || '[]');
+    // Fallback para placeholders se necessário
+    const allPosts = posts.length > 0 ? posts : [
+        { id: 1, content: "Bem-vindo ao seu novo feed dinâmico!", author: "Sistema", date: "Há 1 min", icon: "fa-rocket", color: "emerald" },
+        { id: 2, content: "Explore as funcionalidades do Menu Rápido.", author: "Guia", date: "Há 5 min", icon: "fa-lightbulb", color: "amber" }
+    ];
+    
+    const post = allPosts.find(p => p.id == postId);
+    if (!post) return;
+
+    const modal = document.getElementById('view-post-modal');
+    const sheet = modal.querySelector('.bottom-sheet');
+
+    // Popula dados
+    document.getElementById('view-post-author').innerText = post.author;
+    document.getElementById('view-post-date').innerText = post.date;
+    document.getElementById('view-post-content').innerText = post.content;
+    
+    const iconBg = document.getElementById('view-post-icon-bg');
+    iconBg.className = `w-10 h-10 rounded-2xl flex items-center justify-center bg-${post.color || 'slate'}-100 text-${post.color || 'slate'}-500`;
+    document.getElementById('view-post-icon').className = `fa-solid ${post.icon || 'fa-image'}`;
+
+    modal.classList.remove('hidden');
+    setTimeout(() => sheet.classList.add('active'), 10);
+}
+
+function closeViewPostModal() {
+    const modal = document.getElementById('view-post-modal');
+    const sheet = modal.querySelector('.bottom-sheet');
+    sheet.classList.remove('active');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        sheet.style.transform = '';
+    }, 300);
 }
 
 // Inicializa gestos nos modais
@@ -198,6 +235,12 @@ window.addEventListener('load', () => {
     if (postModal) {
         const postSheet = postModal.querySelector('.bottom-sheet');
         initBottomSheetGestures(postSheet, closePostModal);
+    }
+
+    const viewPostModal = document.getElementById('view-post-modal');
+    if (viewPostModal) {
+        const viewPostSheet = viewPostModal.querySelector('.bottom-sheet');
+        initBottomSheetGestures(viewPostSheet, closeViewPostModal);
     }
 
     renderPosts();
