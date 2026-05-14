@@ -1002,7 +1002,7 @@ function updateQuizUI() {
 
     question.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
-        btn.className = 'w-full p-5 rounded-[1.5rem] bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 text-left font-bold text-slate-700 dark:text-slate-200 active:scale-[0.98] transition-all shadow-sm flex items-center justify-between group';
+        btn.className = 'w-full p-4 rounded-[1.2rem] bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 text-left font-bold text-slate-700 dark:text-slate-200 active:scale-[0.98] transition-all shadow-sm flex items-center justify-between group';
         btn.innerHTML = `
             <div class="flex items-center space-x-4">
                 <div class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-white/5 flex items-center justify-center text-[10px] font-black text-slate-400 uppercase">${String.fromCharCode(65 + idx)}</div>
