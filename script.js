@@ -928,24 +928,38 @@ window.addEventListener('load', () => {
     renderPosts();
 });
 
-// Lógica de Quiz Game
+// Lógica de Quiz Game Pro
 let currentQuestionIndex = 0;
 let quizScore = 0;
+let quizLives = 3;
+let quizCoins = 120;
+let answered = false;
+
 const quizQuestions = [
     {
         q: "Qual dessas tecnologias é a base para um PWA?",
-        options: ["Service Workers", "Python", "Swift"],
+        options: ["Service Workers", "Python", "Swift", "C++"],
         correct: 0
     },
     {
         q: "O que o comando 'git push' faz?",
-        options: ["Baixa o código", "Envia o código", "Deleta o código"],
+        options: ["Baixa o código", "Envia o código", "Deleta o código", "Cria um branch"],
         correct: 1
     },
     {
         q: "Qual o foco principal de um design UX?",
-        options: ["Apenas cores", "Experiência do Usuário", "Velocidade do banco"],
+        options: ["Apenas cores", "Experiência do Usuário", "Velocidade do banco", "Marketing"],
         correct: 1
+    },
+    {
+        q: "Qual tag HTML é usada para links?",
+        options: ["<link>", "<a>", "<url>", "<href>"],
+        correct: 1
+    },
+    {
+        q: "O que significa CSS?",
+        options: ["Computer Style Sheets", "Creative Style System", "Cascading Style Sheets", "Color Style Sheets"],
+        correct: 2
     }
 ];
 
@@ -953,6 +967,9 @@ function openQuiz() {
     document.getElementById('quiz-modal').classList.remove('hidden');
     currentQuestionIndex = 0;
     quizScore = 0;
+    quizLives = 3;
+    answered = false;
+    updateQuizStats();
     updateQuizUI();
     closeQuickMenu();
 }
@@ -961,12 +978,23 @@ function closeQuiz() {
     document.getElementById('quiz-modal').classList.add('hidden');
 }
 
+function updateQuizStats() {
+    document.getElementById('quiz-lives').innerText = quizLives;
+    document.getElementById('quiz-coins').innerText = quizCoins;
+}
+
 function updateQuizUI() {
+    answered = false;
     const question = quizQuestions[currentQuestionIndex];
     document.getElementById('quiz-question').innerText = question.q;
-    document.getElementById('quiz-score').innerText = `${quizScore} pts`;
     
-    const progress = ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
+    // Reset Botão Próxima
+    const nextBtn = document.getElementById('quiz-next-btn');
+    nextBtn.disabled = true;
+    nextBtn.innerText = currentQuestionIndex === quizQuestions.length - 1 ? 'Finalizar' : 'Próxima';
+
+    // Progresso
+    const progress = (currentQuestionIndex / quizQuestions.length) * 100;
     document.getElementById('quiz-progress').style.width = `${progress}%`;
 
     const optionsContainer = document.getElementById('quiz-options');
@@ -974,11 +1002,12 @@ function updateQuizUI() {
 
     question.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
-        // Botões maiores e mais elegantes para tela cheia
-        btn.className = 'w-full p-6 rounded-3xl bg-slate-50 dark:bg-white/5 border-2 border-transparent text-left font-black text-slate-800 dark:text-slate-200 active:scale-[0.98] transition-all shadow-sm flex items-center justify-between group';
+        btn.className = 'w-full p-5 rounded-[1.5rem] bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 text-left font-bold text-slate-700 dark:text-slate-200 active:scale-[0.98] transition-all shadow-sm flex items-center justify-between group';
         btn.innerHTML = `
-            <span>${opt}</span>
-            <i class="fa-solid fa-chevron-right text-slate-300 opacity-0 group-active:opacity-100 transition-opacity"></i>
+            <div class="flex items-center space-x-4">
+                <div class="w-8 h-8 rounded-lg bg-slate-50 dark:bg-white/5 flex items-center justify-center text-[10px] font-black text-slate-400 uppercase">${String.fromCharCode(65 + idx)}</div>
+                <span>${opt}</span>
+            </div>
         `;
         btn.onclick = () => handleQuizAnswer(idx, btn);
         optionsContainer.appendChild(btn);
@@ -986,30 +1015,75 @@ function updateQuizUI() {
 }
 
 function handleQuizAnswer(idx, btn) {
+    if (answered) return;
+    answered = true;
+
+    const question = quizQuestions[currentQuestionIndex];
+    const allBtns = document.getElementById('quiz-options').querySelectorAll('button');
+    const nextBtn = document.getElementById('quiz-next-btn');
+
+    if (idx === question.correct) {
+        btn.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-500/10');
+        btn.querySelector('.bg-slate-50').classList.add('bg-emerald-500', 'text-white');
+        quizScore += 100;
+        quizCoins += 10;
+        showAlert('Correto! +100 XP', 'fa-circle-check');
+    } else {
+        btn.classList.add('border-rose-500', 'bg-rose-50', 'dark:bg-rose-500/10');
+        btn.querySelector('.bg-slate-50').classList.add('bg-rose-500', 'text-white');
+        quizLives--;
+        showAlert('Resposta errada!', 'fa-circle-xmark');
+        
+        // Mostra a correta
+        allBtns[question.correct].classList.add('border-emerald-500/50');
+    }
+
+    updateQuizStats();
+    nextBtn.disabled = false;
+
+    if (quizLives <= 0) {
+        setTimeout(() => {
+            showAlert('Game Over! Suas vidas acabaram.', 'fa-skull');
+            closeQuiz();
+        }, 1000);
+    }
+}
+
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < quizQuestions.length) {
+        updateQuizUI();
+    } else {
+        const progress = 100;
+        document.getElementById('quiz-progress').style.width = `${progress}%`;
+        setTimeout(() => {
+            showAlert(`Quiz Concluído! XP: ${quizScore}`, 'fa-trophy');
+            closeQuiz();
+        }, 500);
+    }
+}
+
+function useHint() {
+    if (answered || quizCoins < 50) {
+        if (quizCoins < 50) showAlert('Moedas insuficientes (Custa 50)', 'fa-coins');
+        return;
+    }
+
+    quizCoins -= 50;
+    updateQuizStats();
+
     const question = quizQuestions[currentQuestionIndex];
     const allBtns = document.getElementById('quiz-options').querySelectorAll('button');
     
-    // Desativa todos para evitar cliques múltiplos
-    allBtns.forEach(b => b.disabled = true);
-
-    if (idx === question.correct) {
-        btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
-        btn.classList.remove('bg-slate-50', 'dark:bg-white/5');
-        quizScore += 100;
-        showAlert('Correto! +100 pontos', 'fa-circle-check');
-    } else {
-        btn.classList.add('bg-rose-500', 'text-white', 'border-rose-600');
-        btn.classList.remove('bg-slate-50', 'dark:bg-white/5');
-        showAlert('Ops! Resposta errada.', 'fa-circle-xmark');
-    }
-
-    setTimeout(() => {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < quizQuestions.length) {
-            updateQuizUI();
-        } else {
-            showAlert(`Quiz Finalizado! Score: ${quizScore}`, 'fa-trophy');
-            closeQuiz();
+    // Desativa duas opções erradas
+    let removed = 0;
+    allBtns.forEach((btn, idx) => {
+        if (idx !== question.correct && removed < 2) {
+            btn.style.opacity = '0.3';
+            btn.disabled = true;
+            removed++;
         }
-    }, 1500);
+    });
+
+    showAlert('Dica usada! -50 moedas', 'fa-lightbulb');
 }
