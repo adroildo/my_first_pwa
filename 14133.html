@@ -309,7 +309,7 @@
 
                 <!-- Fase 2: ETP -->
                 <div class="relative flex items-start">
-                    <div class="progress-circle shadow-md shrink-0" style="--percent: 75%; --progress-color: #2563eb;">
+                    <div class="progress-circle shadow-md shrink-0" style="--percent: 90%; --progress-color: #2563eb;">
                         <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center z-10">
                             <i class="fa-solid fa-pen-nib text-xs"></i>
                         </div>
@@ -320,48 +320,58 @@
                             <p class="text-[11px] text-slate-500 font-medium">Estudo Técnico Preliminar</p>
                         </div>
 
-                        <!-- MICRO MISSÃO 1: IDENTIFICAÇÃO (COMPLETA) -->
+                        <!-- MICRO MISSÃO 1 (COMPLETA) -->
                         <div class="mission-card completed">
                             <div class="flex justify-between items-start mb-2">
                                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 1: Identificação</span>
                                 <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
                             </div>
-                            <h5 class="text-[10px] font-bold text-slate-600 mb-3">Necessidade, Requisitos e Quantitativos</h5>
+                            <h5 class="text-[10px] font-bold text-slate-600 mb-3">Necessidade e Requisitos</h5>
                             <button onclick="playMission(1)"
-                                class="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-500 text-[8px] font-black rounded-lg tap-feedback uppercase tracking-widest border border-slate-100 dark:border-white/5">
+                                class="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-500 text-[8px] font-black rounded-lg tap-feedback uppercase border border-slate-100 dark:border-white/5">
                                 Revisar Missão
                             </button>
                         </div>
 
-                        <!-- MICRO MISSÃO 2: MERCADO E CUSTOS (ATIVA) -->
+                        <!-- MICRO MISSÃO 2 (COMPLETA) -->
+                        <div class="mission-card completed">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 2: Mercado</span>
+                                <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
+                            </div>
+                            <h5 class="text-[10px] font-bold text-slate-600 mb-3">Custos e Parcelamento</h5>
+                            <button onclick="playMission(2)"
+                                class="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-500 text-[8px] font-black rounded-lg tap-feedback uppercase border border-slate-100 dark:border-white/5">
+                                Revisar Missão
+                            </button>
+                        </div>
+
+                        <!-- MICRO MISSÃO 3 (COMPLETA) -->
+                        <div class="mission-card completed">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 3: Estratégia</span>
+                                <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
+                            </div>
+                            <h5 class="text-[10px] font-bold text-slate-600 mb-3">Resultados e Providências</h5>
+                            <button onclick="playMission(3)"
+                                class="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-500 text-[8px] font-black rounded-lg tap-feedback uppercase border border-slate-100 dark:border-white/5">
+                                Revisar Missão
+                            </button>
+                        </div>
+
+                        <!-- MICRO MISSÃO 4: VIABILIDADE (ATIVA) -->
                         <div class="mission-card active">
                             <div class="flex justify-between items-center mb-3">
                                 <div class="flex items-center">
                                     <span class="w-1.5 h-1.5 rounded-full bg-blue-600 mr-2 status-pulse"></span>
-                                    <span class="text-[9px] font-black text-blue-900 uppercase tracking-widest">Missão 2: Mercado</span>
+                                    <span class="text-[9px] font-black text-blue-900 uppercase tracking-widest">Missão 4: Viabilidade</span>
                                 </div>
-                                <span class="text-[8px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">EM JOGO</span>
+                                <span class="text-[8px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">FINAL</span>
                             </div>
-                            <h5 class="text-[10px] font-bold text-slate-800 mb-3">Estudo de Mercado, Custos e Parcelamento</h5>
-                            <button onclick="playMission(2)"
+                            <h5 class="text-[10px] font-bold text-slate-800 mb-3">Solução, Ambiental e Parecer Final</h5>
+                            <button onclick="playMission(4)"
                                 class="w-full py-2.5 bg-blue-600 text-white text-[9px] font-black rounded-xl shadow-lg tap-feedback uppercase tracking-widest">
-                                Continuar Estudo
-                            </button>
-                        </div>
-
-                        <!-- MICRO MISSÃO 3: ESTRATÉGIA (ATIVA) -->
-                        <div class="mission-card active border-dashed border-slate-200">
-                            <div class="flex justify-between items-center mb-3">
-                                <div class="flex items-center">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-300 mr-2"></span>
-                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 3: Estratégia</span>
-                                </div>
-                                <span class="text-[8px] font-black text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full">PRÓXIMA</span>
-                            </div>
-                            <h5 class="text-[10px] font-bold text-slate-400 mb-3">Resultados, Providências e Correlatas</h5>
-                            <button onclick="playMission(3)"
-                                class="w-full py-2.5 bg-slate-100 text-slate-400 text-[9px] font-black rounded-xl tap-feedback uppercase tracking-widest">
-                                Iniciar Estratégia
+                                Concluir ETP
                             </button>
                         </div>
                     </div>
@@ -445,6 +455,11 @@
             <button onclick="switchTab(7)" id="tab-7-btn" class="mission-tab m3-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1. Resultados</button>
             <button onclick="switchTab(8)" id="tab-8-btn" class="mission-tab m3-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2. Providências</button>
             <button onclick="switchTab(9)" id="tab-9-btn" class="mission-tab m3-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">3. Correlatas</button>
+
+            <!-- TABS MISSÃO 4 -->
+            <button onclick="switchTab(10)" id="tab-10-btn" class="mission-tab m4-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1. Solução</button>
+            <button onclick="switchTab(11)" id="tab-11-btn" class="mission-tab m4-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2. Ambiental</button>
+            <button onclick="switchTab(12)" id="tab-12-btn" class="mission-tab m4-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">3. Viabilidade</button>
         </div>
 
         <!-- Conteúdo das Abas -->
@@ -521,6 +536,29 @@
                 <div>
                     <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Contratações Correlatas <span class="text-rose-500">*</span></label>
                     <textarea id="field-corr" oninput="checkFormCompletion()" placeholder="Contratações interdependentes detectadas..." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                </div>
+            </div>
+
+            <!-- CONTEÚDO M4 -->
+            <div id="mission-tab-10" class="tab-content m4-content hidden space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Descrição da Solução Final <span class="text-rose-500">*</span></label>
+                    <textarea id="field-sol" oninput="checkFormCompletion()" placeholder="Detalhamento técnico da solução escolhida..." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                </div>
+            </div>
+            <div id="mission-tab-11" class="tab-content m4-content hidden space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Impactos Ambientais <span class="text-rose-500">*</span></label>
+                    <textarea id="field-amb" oninput="checkFormCompletion()" placeholder="Descrição dos impactos e medidas de tratamento..." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                </div>
+            </div>
+            <div id="mission-tab-12" class="tab-content m4-content hidden space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Viabilidade da Contratação <span class="text-rose-500">*</span></label>
+                    <textarea id="field-viab" oninput="checkFormCompletion()" placeholder="Posicionamento conclusivo sobre a viabilidade..." 
                         class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
@@ -678,9 +716,12 @@
             document.querySelectorAll('.m3-tab, .m3-content').forEach(el => {
                 missionId === 3 ? el.classList.remove('hidden') : el.classList.add('hidden');
             });
+            document.querySelectorAll('.m4-tab, .m4-content').forEach(el => {
+                missionId === 4 ? el.classList.remove('hidden') : el.classList.add('hidden');
+            });
 
             // Reseta para a primeira aba da missão
-            const startTab = missionId === 1 ? 1 : (missionId === 2 ? 4 : 7);
+            const startTab = missionId === 1 ? 1 : (missionId === 2 ? 4 : (missionId === 3 ? 7 : 10));
             switchTab(startTab);
             checkFormCompletion();
         }
@@ -703,6 +744,11 @@
                 const prov = document.getElementById('field-prov').value.trim();
                 const corr = document.getElementById('field-corr').value.trim();
                 isComplete = res.length > 5 && prov.length > 5 && corr.length > 5;
+            } else if (activeMission === 4) {
+                const sol = document.getElementById('field-sol').value.trim();
+                const amb = document.getElementById('field-amb').value.trim();
+                const viab = document.getElementById('field-viab').value.trim();
+                isComplete = sol.length > 5 && amb.length > 5 && viab.length > 5;
             }
             
             const btn = document.getElementById('finish-mission-btn');
