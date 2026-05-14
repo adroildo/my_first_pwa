@@ -918,10 +918,10 @@ window.addEventListener('load', () => {
         initBottomSheetGestures(postSheet, closePostModal);
     }
 
-    const viewPostModal = document.getElementById('view-post-modal');
-    if (viewPostModal) {
-        const viewPostSheet = viewPostModal.querySelector('.bottom-sheet');
-        initBottomSheetGestures(viewPostSheet, closeViewPostModal);
+    const docModal = document.getElementById('doc-modal');
+    if (docModal) {
+        const docSheet = docModal.querySelector('.bottom-sheet');
+        initBottomSheetGestures(docSheet, closeDocModal);
     }
 
     initSidebarGestures();
@@ -1088,10 +1088,78 @@ function useHint() {
 }
 
 // Lógica de Automação de Documentos
+const docModal = document.getElementById('doc-modal');
+const docSheet = docModal ? docModal.querySelector('.bottom-sheet') : null;
+
 function openDocForm(docType) {
-    showAlert(`Iniciando ${docType.toUpperCase()}...`, "fa-file-signature");
     closeQuickMenu();
     
-    // Futura implementação do formulário de metadados
-    console.log(`Abrindo formulário para: ${docType}`);
+    // Configura o título do modal baseado no tipo
+    const titleMap = {
+        'memorando': 'Novo Memorando',
+        'oficio': 'Novo Ofício',
+        'requisicao': 'Nova Requisição',
+        'relatorio': 'Novo Relatório'
+    };
+    
+    document.getElementById('doc-modal-title').innerText = titleMap[docType] || 'Novo Documento';
+    document.getElementById('doc-modal-subtitle').innerText = `Metadados para ${docType}`;
+    
+    // Limpa campos
+    document.getElementById('doc-title').value = '';
+    document.getElementById('doc-number').value = '';
+    document.getElementById('doc-signer').value = localStorage.getItem('user_name') || '';
+    document.getElementById('doc-origin').value = '';
+    document.getElementById('doc-destination').value = '';
+
+    openDocModal();
+}
+
+function openDocModal() {
+    docModal.classList.remove('hidden');
+    setTimeout(() => docSheet.classList.add('active'), 10);
+}
+
+function closeDocModal() {
+    docSheet.classList.remove('active');
+    setTimeout(() => {
+        docModal.classList.add('hidden');
+        docSheet.style.transform = '';
+    }, 300);
+}
+
+function generateDocJson() {
+    const data = {
+        tipo: document.getElementById('doc-modal-title').innerText,
+        titulo: document.getElementById('doc-title').value,
+        numero: document.getElementById('doc-number').value,
+        assinante: document.getElementById('doc-signer').value,
+        origem: document.getElementById('doc-origin').value,
+        destino: document.getElementById('doc-destination').value,
+        data_criacao: new Date().toISOString()
+    };
+
+    if (!data.titulo || !data.numero) {
+        showAlert("Preencha ao menos o Título e o Número!", "fa-triangle-exclamation");
+        return;
+    }
+
+    console.log("JSON Gerado:", JSON.stringify(data, null, 2));
+    
+    // Simulação de salvamento
+    const docs = JSON.parse(localStorage.getItem('saved_docs') || '[]');
+    docs.unshift(data);
+    localStorage.setItem('saved_docs', JSON.stringify(docs));
+
+    showAlert("JSON gerado e salvo localmente!", "fa-file-code");
+    closeDocModal();
+    
+    // Opcional: Download do JSON
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", `doc_${data.numero.replace('/', '-')}.json`);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
 }
