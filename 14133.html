@@ -287,18 +287,9 @@
                     <!-- Cards de missão injetados via JS -->
                 </div>
 
-                <!-- Fase 3: TR -->
-                <div class="relative flex items-center opacity-40">
-                    <div class="progress-circle shrink-0" style="--percent: 0%; --progress-color: #94a3b8;">
-                        <div
-                            class="w-9 h-9 rounded-full bg-slate-200 text-slate-400 flex items-center justify-center z-10">
-                            <i class="fa-solid fa-lock text-xs"></i>
-                        </div>
-                    </div>
-                    <div class="ml-6">
-                        <h4 class="font-bold text-sm text-slate-500">Fase 3: TR</h4>
-                        <p class="text-[11px] text-slate-400">Termo de Referência</p>
-                    </div>
+                <!-- Fases dinâmicas injetadas via JS -->
+                <div id="etp-timeline-phase" class="space-y-4">
+                    <!-- Cards de missão injetados via JS -->
                 </div>
             </div>
         </div>
@@ -688,16 +679,21 @@
         }
 
         let missionStatus = [
-            // FASE 1: DFD
+            // FASE 1: DFD (IDs 21-24)
             { id: 21, title: 'DFD: A Origem', desc: 'Necessidade e Responsável', status: 'active', phase: 'Fase 1: DFD', phaseDesc: 'Documento de Formalização' },
             { id: 22, title: 'DFD: O Objeto', desc: 'Descrição e Quantidade', status: 'locked', phase: 'Fase 1: DFD' },
             { id: 23, title: 'DFD: Logística', desc: 'Valor e Prazo', status: 'locked', phase: 'Fase 1: DFD' },
             { id: 24, title: 'DFD: Governança', desc: 'Prioridade e Equipe', status: 'locked', phase: 'Fase 1: DFD' },
-            // FASE 2: ETP
+            // FASE 2: ETP (IDs 1-4)
             { id: 1, title: 'ETP: Identificação', desc: 'Necessidade e Requisitos', status: 'locked', phase: 'Fase 2: ETP', phaseDesc: 'Estudo Técnico Preliminar' },
             { id: 2, title: 'ETP: Mercado', desc: 'Custos e Parcelamento', status: 'locked', phase: 'Fase 2: ETP' },
             { id: 3, title: 'ETP: Estratégia', desc: 'Resultados e Providências', status: 'locked', phase: 'Fase 2: ETP' },
-            { id: 4, title: 'ETP: Viabilidade', desc: 'Solução e Parecer Final', status: 'locked', phase: 'Fase 2: ETP' }
+            { id: 4, title: 'ETP: Viabilidade', desc: 'Solução e Parecer Final', status: 'locked', phase: 'Fase 2: ETP' },
+            // FASE 3: TR (IDs 31-34 - Placeholder)
+            { id: 31, title: 'TR: Definição', desc: 'Especificação do Objeto', status: 'locked', phase: 'Fase 3: TR', phaseDesc: 'Termo de Referência' },
+            { id: 32, title: 'TR: Execução', desc: 'Forma e Cronograma', status: 'locked', phase: 'Fase 3: TR' },
+            { id: 33, title: 'TR: Pagamento', desc: 'Critérios e Medição', status: 'locked', phase: 'Fase 3: TR' },
+            { id: 34, title: 'TR: Seleção', desc: 'Critérios de Julgamento', status: 'locked', phase: 'Fase 3: TR' }
         ];
 
         function renderTimeline() {
@@ -716,18 +712,35 @@
                 const progress = calculatePhaseProgress(phase.missions);
                 
                 // Define cor base da fase
-                const isPhase1 = phaseTitle.includes('Fase 1');
-                const phaseColor = isPhase1 ? '#10b981' : '#2563eb';
-                const bgClass = isPhase1 ? 'bg-emerald-500' : 'bg-blue-600';
-                const textClass = isPhase1 ? 'text-emerald-600' : 'text-blue-600';
-                const badgeClass = isPhase1 ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600';
-                const btnClass = isPhase1 ? 'bg-emerald-600 shadow-[0_8px_25px_-5px_rgba(16,185,129,0.4)]' : 'bg-blue-600 shadow-[0_8px_25px_-5px_rgba(37,99,235,0.4)]';
+                let phaseColor, bgClass, textClass, badgeClass, btnClass, phaseIcon;
+                if (phaseTitle.includes('Fase 1')) {
+                    phaseColor = '#10b981'; // Emerald
+                    bgClass = 'bg-emerald-500';
+                    textClass = 'text-emerald-600';
+                    badgeClass = 'bg-emerald-50 text-emerald-600';
+                    btnClass = 'bg-emerald-600 shadow-[0_8px_25px_-5px_rgba(16,185,129,0.4)]';
+                    phaseIcon = 'fa-file-contract';
+                } else if (phaseTitle.includes('Fase 2')) {
+                    phaseColor = '#2563eb'; // Blue
+                    bgClass = 'bg-blue-600';
+                    textClass = 'text-blue-600';
+                    badgeClass = 'bg-blue-50 text-blue-600';
+                    btnClass = 'bg-blue-600 shadow-[0_8px_25px_-5px_rgba(37,99,235,0.4)]';
+                    phaseIcon = 'fa-pen-nib';
+                } else {
+                    phaseColor = '#f59e0b'; // Amber
+                    bgClass = 'bg-amber-500';
+                    textClass = 'text-amber-600';
+                    badgeClass = 'bg-amber-50 text-amber-600';
+                    btnClass = 'bg-amber-600 shadow-[0_8px_25px_-5px_rgba(245,158,11,0.4)]';
+                    phaseIcon = 'fa-gavel';
+                }
 
                 html += `
                     <div class="relative flex items-start ${isLocked ? 'opacity-40 grayscale' : ''}">
                         <div class="progress-circle shadow-md shrink-0" style="--percent: ${progress}%; --progress-color: ${phaseColor};">
-                            <div class="w-9 h-9 rounded-full ${progress === 100 ? 'bg-emerald-500' : bgClass} text-white flex items-center justify-center z-10 transition-colors duration-500">
-                                <i class="fa-solid ${progress === 100 ? 'fa-check' : (isPhase1 ? 'fa-file-contract' : 'fa-pen-nib')} text-xs"></i>
+                            <div class="w-9 h-9 rounded-full ${progress === 100 ? bgClass : (isLocked ? 'bg-slate-200' : bgClass)} text-white flex items-center justify-center z-10 transition-colors duration-500">
+                                <i class="fa-solid ${progress === 100 ? 'fa-check' : (isLocked ? 'fa-lock' : phaseIcon)} text-xs"></i>
                             </div>
                         </div>
                         <div class="ml-6 w-full space-y-4 pb-10">
@@ -758,7 +771,7 @@
                                 <div class="flex justify-between items-center mb-3">
                                     <div class="flex items-center">
                                         <span class="w-1.5 h-1.5 rounded-full ${bgClass} mr-2 status-pulse"></span>
-                                        <span class="text-[9px] font-black ${isPhase1 ? 'text-emerald-900' : 'text-blue-900'} uppercase tracking-widest">${m.title}</span>
+                                        <span class="text-[9px] font-black ${textClass.replace('text-', 'text-')} uppercase tracking-widest">${m.title}</span>
                                     </div>
                                     <span class="text-[8px] font-black ${badgeClass} px-2 py-0.5 rounded-full uppercase">Em Jogo</span>
                                 </div>
@@ -794,16 +807,20 @@
             const progressLine = document.getElementById('trailProgress');
             progressLine.style.height = `${totalProgress}%`;
 
-            // Ajuste Dinâmico da Cor da Linha
-            // Se o progresso passou de 50% (entrou no ETP), calculamos onde a cor deve mudar
-            // para que o Verde pare exatamente na marca de 50% do container total.
-            if (totalProgress <= 50) {
+            // Lógica de Gradiente para 3 Fases (DFD: 33.33%, ETP: 66.66%, TR: 100%)
+            if (totalProgress <= 33.33) {
                 progressLine.style.background = '#10b981';
+            } else if (totalProgress <= 66.66) {
+                const stop1 = (33.33 / totalProgress) * 100;
+                progressLine.style.background = `linear-gradient(to bottom, #10b981 ${stop1}%, #2563eb ${stop1}%)`;
             } else {
-                // Cálculo: (Ponto de Transição / Progresso Atual) * 100
-                const colorStop = (50 / totalProgress) * 100;
-                progressLine.style.background = `linear-gradient(to bottom, #10b981 ${colorStop}%, #2563eb ${colorStop}%)`;
+                const stop1 = (33.33 / totalProgress) * 100;
+                const stop2 = (66.66 / totalProgress) * 100;
+                progressLine.style.background = `linear-gradient(to bottom, #10b981 ${stop1}%, #2563eb ${stop1}%, #2563eb ${stop2}%, #f59e0b ${stop2}%)`;
             }
+
+            // Atualiza a trilha de fundo também
+            document.querySelector('.trail-line').style.background = 'linear-gradient(to bottom, #d1fae5 33.33%, #dbeafe 33.33%, #dbeafe 66.66%, #fef3c7 66.66%)';
         }
 
         function calculatePhaseProgress(missions) {
