@@ -309,7 +309,7 @@
 
                 <!-- Fase 2: ETP -->
                 <div class="relative flex items-start">
-                    <div class="progress-circle shadow-md shrink-0" style="--percent: 50%; --progress-color: #2563eb;">
+                    <div class="progress-circle shadow-md shrink-0" style="--percent: 75%; --progress-color: #2563eb;">
                         <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center z-10">
                             <i class="fa-solid fa-pen-nib text-xs"></i>
                         </div>
@@ -326,10 +326,11 @@
                                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 1: Identificação</span>
                                 <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
                             </div>
-                            <h5 class="text-[10px] font-bold text-slate-600 mb-2">Necessidade, Requisitos e Quantitativos</h5>
-                            <div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-emerald-500 rounded-full" style="width: 100%"></div>
-                            </div>
+                            <h5 class="text-[10px] font-bold text-slate-600 mb-3">Necessidade, Requisitos e Quantitativos</h5>
+                            <button onclick="playMission(1)"
+                                class="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-500 text-[8px] font-black rounded-lg tap-feedback uppercase tracking-widest border border-slate-100 dark:border-white/5">
+                                Revisar Missão
+                            </button>
                         </div>
 
                         <!-- MICRO MISSÃO 2: MERCADO E CUSTOS (ATIVA) -->
@@ -345,6 +346,22 @@
                             <button onclick="playMission(2)"
                                 class="w-full py-2.5 bg-blue-600 text-white text-[9px] font-black rounded-xl shadow-lg tap-feedback uppercase tracking-widest">
                                 Continuar Estudo
+                            </button>
+                        </div>
+
+                        <!-- MICRO MISSÃO 3: ESTRATÉGIA (ATIVA) -->
+                        <div class="mission-card active border-dashed border-slate-200">
+                            <div class="flex justify-between items-center mb-3">
+                                <div class="flex items-center">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-300 mr-2"></span>
+                                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 3: Estratégia</span>
+                                </div>
+                                <span class="text-[8px] font-black text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full">PRÓXIMA</span>
+                            </div>
+                            <h5 class="text-[10px] font-bold text-slate-400 mb-3">Resultados, Providências e Correlatas</h5>
+                            <button onclick="playMission(3)"
+                                class="w-full py-2.5 bg-slate-100 text-slate-400 text-[9px] font-black rounded-xl tap-feedback uppercase tracking-widest">
+                                Iniciar Estratégia
                             </button>
                         </div>
                     </div>
@@ -413,7 +430,7 @@
         </header>
 
         <!-- Navegação por Abas (Dinâmicas) -->
-        <div id="mission-tabs-container" class="flex px-6 pt-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-white/5">
+        <div id="mission-tabs-container" class="flex px-6 pt-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-white/5 overflow-x-auto no-scrollbar">
             <!-- TABS MISSÃO 1 -->
             <button onclick="switchTab(1)" id="tab-1-btn" class="mission-tab m1-tab active pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1. Necessidade</button>
             <button onclick="switchTab(2)" id="tab-2-btn" class="mission-tab m1-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2. Requisitos</button>
@@ -423,6 +440,11 @@
             <button onclick="switchTab(4)" id="tab-4-btn" class="mission-tab m2-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1. Mercado</button>
             <button onclick="switchTab(5)" id="tab-5-btn" class="mission-tab m2-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2. Custos</button>
             <button onclick="switchTab(6)" id="tab-6-btn" class="mission-tab m2-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">3. Parcelamento</button>
+
+            <!-- TABS MISSÃO 3 -->
+            <button onclick="switchTab(7)" id="tab-7-btn" class="mission-tab m3-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1. Resultados</button>
+            <button onclick="switchTab(8)" id="tab-8-btn" class="mission-tab m3-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2. Providências</button>
+            <button onclick="switchTab(9)" id="tab-9-btn" class="mission-tab m3-tab hidden pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">3. Correlatas</button>
         </div>
 
         <!-- Conteúdo das Abas -->
@@ -476,6 +498,29 @@
                 <div>
                     <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Justificativa de Parcelamento <span class="text-rose-500">*</span></label>
                     <textarea id="field-parc" oninput="checkFormCompletion()" placeholder="Por que dividir (ou não) o objeto?" 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                </div>
+            </div>
+
+            <!-- CONTEÚDO M3 -->
+            <div id="mission-tab-7" class="tab-content m3-content hidden space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Resultados Pretendidos <span class="text-rose-500">*</span></label>
+                    <textarea id="field-res" oninput="checkFormCompletion()" placeholder="Economicidade e eficácia esperada..." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                </div>
+            </div>
+            <div id="mission-tab-8" class="tab-content m3-content hidden space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Providências Prévias <span class="text-rose-500">*</span></label>
+                    <textarea id="field-prov" oninput="checkFormCompletion()" placeholder="Ações antes da celebração do contrato..." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                </div>
+            </div>
+            <div id="mission-tab-9" class="tab-content m3-content hidden space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Contratações Correlatas <span class="text-rose-500">*</span></label>
+                    <textarea id="field-corr" oninput="checkFormCompletion()" placeholder="Contratações interdependentes detectadas..." 
                         class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
@@ -630,9 +675,13 @@
             document.querySelectorAll('.m2-tab, .m2-content').forEach(el => {
                 missionId === 2 ? el.classList.remove('hidden') : el.classList.add('hidden');
             });
+            document.querySelectorAll('.m3-tab, .m3-content').forEach(el => {
+                missionId === 3 ? el.classList.remove('hidden') : el.classList.add('hidden');
+            });
 
             // Reseta para a primeira aba da missão
-            switchTab(missionId === 1 ? 1 : 4);
+            const startTab = missionId === 1 ? 1 : (missionId === 2 ? 4 : 7);
+            switchTab(startTab);
             checkFormCompletion();
         }
 
@@ -649,6 +698,11 @@
                 const cost = document.getElementById('field-cost').value.trim();
                 const parc = document.getElementById('field-parc').value.trim();
                 isComplete = merc.length > 5 && cost.length > 5 && parc.length > 5;
+            } else if (activeMission === 3) {
+                const res = document.getElementById('field-res').value.trim();
+                const prov = document.getElementById('field-prov').value.trim();
+                const corr = document.getElementById('field-corr').value.trim();
+                isComplete = res.length > 5 && prov.length > 5 && corr.length > 5;
             }
             
             const btn = document.getElementById('finish-mission-btn');
