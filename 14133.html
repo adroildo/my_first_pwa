@@ -308,74 +308,9 @@
                     </div>
                 </div>
 
-                <!-- Fase 2: ETP -->
-                <div class="relative flex items-start">
-                    <div class="progress-circle shadow-md shrink-0" style="--percent: 90%; --progress-color: #2563eb;">
-                        <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center z-10">
-                            <i class="fa-solid fa-pen-nib text-xs"></i>
-                        </div>
-                    </div>
-                    <div class="ml-6 w-full space-y-4 pb-10">
-                        <div class="mb-1">
-                            <h4 class="font-bold text-sm text-slate-900">Fase 2: ETP</h4>
-                            <p class="text-[11px] text-slate-500 font-medium">Estudo Técnico Preliminar</p>
-                        </div>
-
-                        <!-- MICRO MISSÃO 1 (COMPLETA) -->
-                        <div class="mission-card completed">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 1: Identificação</span>
-                                <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
-                            </div>
-                            <h5 class="text-[10px] font-bold text-slate-600 mb-3">Necessidade e Requisitos</h5>
-                            <button onclick="playMission(1)"
-                                class="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-500 text-[8px] font-black rounded-lg tap-feedback uppercase border border-slate-100 dark:border-white/5">
-                                Revisar Missão
-                            </button>
-                        </div>
-
-                        <!-- MICRO MISSÃO 2 (COMPLETA) -->
-                        <div class="mission-card completed">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 2: Mercado</span>
-                                <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
-                            </div>
-                            <h5 class="text-[10px] font-bold text-slate-600 mb-3">Custos e Parcelamento</h5>
-                            <button onclick="playMission(2)"
-                                class="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-500 text-[8px] font-black rounded-lg tap-feedback uppercase border border-slate-100 dark:border-white/5">
-                                Revisar Missão
-                            </button>
-                        </div>
-
-                        <!-- MICRO MISSÃO 3 (COMPLETA) -->
-                        <div class="mission-card completed">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 3: Estratégia</span>
-                                <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
-                            </div>
-                            <h5 class="text-[10px] font-bold text-slate-600 mb-3">Resultados e Providências</h5>
-                            <button onclick="playMission(3)"
-                                class="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-500 text-[8px] font-black rounded-lg tap-feedback uppercase border border-slate-100 dark:border-white/5">
-                                Revisar Missão
-                            </button>
-                        </div>
-
-                        <!-- MICRO MISSÃO 4: VIABILIDADE (ATIVA) -->
-                        <div class="mission-card active">
-                            <div class="flex justify-between items-center mb-3">
-                                <div class="flex items-center">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600 mr-2 status-pulse"></span>
-                                    <span class="text-[9px] font-black text-blue-900 uppercase tracking-widest">Missão 4: Viabilidade</span>
-                                </div>
-                                <span class="text-[8px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">FINAL</span>
-                            </div>
-                            <h5 class="text-[10px] font-bold text-slate-800 mb-3">Solução, Ambiental e Parecer Final</h5>
-                            <button onclick="playMission(4)"
-                                class="w-full py-2.5 bg-blue-600 text-white text-[9px] font-black rounded-xl shadow-lg tap-feedback uppercase tracking-widest">
-                                Concluir ETP
-                            </button>
-                        </div>
-                    </div>
+                <!-- Fase 2: ETP (Dinâmico) -->
+                <div id="etp-timeline-phase" class="space-y-4">
+                    <!-- Cards de missão injetados via JS -->
                 </div>
 
                 <!-- Fase 3: TR -->
@@ -861,18 +796,105 @@
             }, 1000);
         }
 
-        function finishMission() {
-            // Fecha o menu de ferramentas se estiver aberto
-            document.getElementById('mission-tools-menu').classList.add('hidden');
+        let missionStatus = [
+            { id: 1, title: 'Identificação', desc: 'Necessidade e Requisitos', status: 'completed' },
+            { id: 2, title: 'Mercado', desc: 'Custos e Parcelamento', status: 'completed' },
+            { id: 3, title: 'Estratégia', desc: 'Resultados e Providências', status: 'active' },
+            { id: 4, title: 'Viabilidade', desc: 'Solução e Parecer Final', status: 'locked' }
+        ];
+
+        function renderTimeline() {
+            const container = document.getElementById('etp-timeline-phase');
+            let html = `
+                <div class="relative flex items-start">
+                    <div class="progress-circle shadow-md shrink-0" style="--percent: ${calculatePhaseProgress()}%; --progress-color: #2563eb;">
+                        <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center z-10">
+                            <i class="fa-solid fa-pen-nib text-xs"></i>
+                        </div>
+                    </div>
+                    <div class="ml-6 w-full space-y-4 pb-10">
+                        <div class="mb-1">
+                            <h4 class="font-bold text-sm text-slate-900">Fase 2: ETP</h4>
+                            <p class="text-[11px] text-slate-500 font-medium">Estudo Técnico Preliminar</p>
+                        </div>
+            `;
+
+            missionStatus.forEach(m => {
+                if (m.status === 'completed') {
+                    html += `
+                        <div class="mission-card completed">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão ${m.id}: ${m.title}</span>
+                                <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
+                            </div>
+                            <h5 class="text-[10px] font-bold text-slate-600 mb-3">${m.desc}</h5>
+                            <button onclick="playMission(${m.id})"
+                                class="w-full py-2 bg-slate-50 dark:bg-white/5 text-slate-500 text-[8px] font-black rounded-lg tap-feedback uppercase border border-slate-100 dark:border-white/5">
+                                Revisar Missão
+                            </button>
+                        </div>
+                    `;
+                } else if (m.status === 'active') {
+                    html += `
+                        <div class="mission-card active">
+                            <div class="flex justify-between items-center mb-3">
+                                <div class="flex items-center">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600 mr-2 status-pulse"></span>
+                                    <span class="text-[9px] font-black text-blue-900 uppercase tracking-widest">Missão ${m.id}: ${m.title}</span>
+                                </div>
+                                <span class="text-[8px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase">${m.id === 4 ? 'Final' : 'Em Jogo'}</span>
+                            </div>
+                            <h5 class="text-[10px] font-bold text-slate-800 mb-3">${m.desc}</h5>
+                            <button onclick="playMission(${m.id})"
+                                class="w-full py-2.5 bg-blue-600 text-white text-[9px] font-black rounded-xl shadow-lg tap-feedback uppercase tracking-widest">
+                                ${m.id === 4 ? 'Concluir ETP' : 'Continuar Estudo'}
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="mission-card opacity-50 grayscale border-dashed border-slate-200">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão ${m.id}: ${m.title}</span>
+                                <i class="fa-solid fa-lock text-slate-300 text-[10px]"></i>
+                            </div>
+                            <h5 class="text-[10px] font-bold text-slate-400">${m.desc}</h5>
+                        </div>
+                    `;
+                }
+            });
+
+            html += `</div></div>`;
+            container.innerHTML = html;
             
+            // Atualiza linha lateral
+            document.getElementById('trailProgress').style.height = `${calculatePhaseProgress()}%`;
+        }
+
+        function calculatePhaseProgress() {
+            const completed = missionStatus.filter(m => m.status === 'completed').length;
+            return (completed / missionStatus.length) * 100;
+        }
+
+        function finishMission() {
             const btn = event.currentTarget;
             const icon = btn.querySelector('i');
             icon.className = 'fa-solid fa-spinner animate-spin text-blue-600';
             
             setTimeout(() => {
+                // Atualiza o estado da missão atual para concluído
+                const currentIdx = activeMission - 1;
+                missionStatus[currentIdx].status = 'completed';
+                
+                // Libera a próxima se existir
+                if (activeMission < missionStatus.length) {
+                    missionStatus[activeMission].status = 'active';
+                }
+
                 closeMissionForm();
+                renderTimeline();
                 showMissionSuccess();
-                icon.className = 'fa-solid fa-circle-check text-xl';
+                icon.className = 'fa-solid fa-flag-checkered text-lg';
             }, 800);
         }
 
@@ -880,7 +902,6 @@
             const modal = document.getElementById('successModal');
             modal.classList.remove('hidden');
             
-            // Explosão de Confetes
             const duration = 3 * 1000;
             const end = Date.now() + duration;
 
@@ -895,7 +916,6 @@
                     angle: 120, spread: 55, origin: { x: 1 },
                     colors: ['#2563eb', '#10b981', '#fbbf24']
                 });
-
                 if (Date.now() < end) requestAnimationFrame(frame);
             }());
 
@@ -904,16 +924,15 @@
 
         function updateXP(amount) {
             const xpDisplay = document.querySelector('#topStatsBoard p.text-sm.font-black');
-            const startXP = userXP;
-            userXP += amount;
+            const startXP = 4250; // Mock base
+            const newXP = startXP + amount;
             
-            // Animação numérica
             let current = startXP;
             const step = amount / 20;
             const timer = setInterval(() => {
                 current += step;
-                if (current >= userXP) {
-                    xpDisplay.innerText = userXP.toLocaleString();
+                if (current >= newXP) {
+                    xpDisplay.innerText = newXP.toLocaleString();
                     clearInterval(timer);
                 } else {
                     xpDisplay.innerText = Math.floor(current).toLocaleString();
@@ -923,29 +942,14 @@
 
         function closeSuccessModal() {
             document.getElementById('successModal').classList.add('hidden');
-            // Opcional: Avançar a trilha visualmente após fechar
-            const trail = document.getElementById('trailProgress');
-            trail.style.height = '65%'; // Simula avanço
         }
 
         function createNewMission() {
-            const btn = document.querySelector('.central-btn');
-            const icon = btn.querySelector('i');
-            icon.className = 'fa-solid fa-spinner animate-spin';
-
-            setTimeout(() => {
-                icon.className = 'fa-solid fa-plus';
-                openMatch('Nova Contratação #2024', 5);
-            }, 800);
+            openMatch('Nova Contratação #2024', 5);
         }
 
-        document.querySelectorAll('.tap-feedback').forEach(btn => {
-            btn.addEventListener('touchstart', () => {
-                if (navigator.vibrate) navigator.vibrate(8);
-            });
-        });
-
         window.onload = () => {
+            renderTimeline();
             console.log("14133 Fácil - Lobby Premium Iniciado.");
         };
     </script>
