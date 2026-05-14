@@ -88,7 +88,7 @@ function initBottomSheetGestures(sheet, closeFn) {
 
     sheet.addEventListener('touchend', () => {
         sheet.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-        
+
         if (currentTranslateY > 120) { // Threshold para fechar
             closeFn();
         } else {
@@ -335,7 +335,7 @@ function handleVerify() {
                 setTimeout(() => {
                     toggleAuth('login');
                     // Reset para permitir nova tentativa se ele tentar cadastrar de novo
-                    attemptsLeft = 3; 
+                    attemptsLeft = 3;
                     document.getElementById('attempts-count').innerText = attemptsLeft;
                 }, 3000);
             } else {
@@ -407,7 +407,7 @@ async function clearAppCache() {
                 await registration.unregister();
             }
         }
-        
+
         // 2. Deletar todos os Caches
         if ('caches' in window) {
             const keys = await caches.keys();
