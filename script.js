@@ -964,7 +964,7 @@ function closeQuiz() {
 function updateQuizUI() {
     const question = quizQuestions[currentQuestionIndex];
     document.getElementById('quiz-question').innerText = question.q;
-    document.getElementById('quiz-score').innerText = `PONTOS: ${quizScore}`;
+    document.getElementById('quiz-score').innerText = `${quizScore} pts`;
     
     const progress = ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
     document.getElementById('quiz-progress').style.width = `${progress}%`;
@@ -974,8 +974,12 @@ function updateQuizUI() {
 
     question.options.forEach((opt, idx) => {
         const btn = document.createElement('button');
-        btn.className = 'w-full p-5 rounded-2xl bg-slate-50 dark:bg-white/5 border-2 border-transparent text-left font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition-all hover:border-indigo-500/30';
-        btn.innerText = opt;
+        // Botões maiores e mais elegantes para tela cheia
+        btn.className = 'w-full p-6 rounded-3xl bg-slate-50 dark:bg-white/5 border-2 border-transparent text-left font-black text-slate-800 dark:text-slate-200 active:scale-[0.98] transition-all shadow-sm flex items-center justify-between group';
+        btn.innerHTML = `
+            <span>${opt}</span>
+            <i class="fa-solid fa-chevron-right text-slate-300 opacity-0 group-active:opacity-100 transition-opacity"></i>
+        `;
         btn.onclick = () => handleQuizAnswer(idx, btn);
         optionsContainer.appendChild(btn);
     });
