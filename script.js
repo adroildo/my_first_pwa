@@ -326,12 +326,23 @@ const scrollContainer = document.getElementById('scroll-container');
 
 function checkAuth() {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    const userName = localStorage.getItem('user_name') || 'Usuário Premium';
+    const userHandle = localStorage.getItem('user_handle') || '@usuario_premium';
 
     if (isLoggedIn) {
         authSection.classList.add('hidden');
         mainHeader.classList.remove('hidden');
         mainNav.classList.remove('hidden');
         scrollContainer.classList.remove('hidden');
+
+        // Sincroniza dados no Perfil e Sidebar
+        document.getElementById('display-name').innerText = userName;
+        document.getElementById('display-username').innerText = userHandle;
+        
+        const sideName = document.getElementById('sidebar-user-name');
+        const sideHandle = document.getElementById('sidebar-user-handle');
+        if (sideName) sideName.innerText = userName;
+        if (sideHandle) sideHandle.innerText = userHandle;
     } else {
         authSection.classList.remove('hidden');
         mainHeader.classList.add('hidden');
@@ -795,4 +806,124 @@ window.addEventListener('appinstalled', (event) => {
     setTimeout(() => {
         successToast.classList.add('hidden');
     }, 4000);
+});
+
+// Lógica de Sidebar
+function openSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    overlay.classList.remove('hidden');
+    setTimeout(() => {
+        overlay.classList.add('opacity-100');
+        sidebar.classList.add('active');
+    }, 10);
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    
+    sidebar.classList.remove('active');
+    overlay.classList.remove('opacity-100');
+    setTimeout(() => {
+        overlay.classList.add('hidden');
+        sidebar.style.transform = ''; // Reset do arraste
+    }, 300);
+}
+
+// Lógica de Dark Mode
+function toggleDarkMode() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('darkMode', isDark);
+    updateDarkModeUI(isDark);
+}
+
+function updateDarkModeUI(isDark) {
+    const toggle = document.getElementById('dark-mode-toggle');
+    const ball = document.getElementById('dark-mode-ball');
+    
+    if (!toggle || !ball) return;
+
+    if (isDark) {
+        toggle.classList.remove('bg-slate-200');
+        toggle.classList.add('bg-indigo-500');
+        ball.classList.remove('left-1');
+        ball.classList.add('left-6');
+    } else {
+        toggle.classList.remove('bg-indigo-500');
+        toggle.classList.add('bg-slate-200');
+        ball.classList.remove('left-6');
+        ball.classList.add('left-1');
+    }
+}
+
+// Carregar Tema Salvo
+window.addEventListener('DOMContentLoaded', () => {
+    const savedDark = localStorage.getItem('darkMode') === 'true';
+    if (savedDark) {
+        document.documentElement.classList.add('dark');
+        updateDarkModeUI(true);
+    }
+});
+
+// Gesto: Swipe Left para fechar Sidebar
+function initSidebarGestures() {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+
+    let sTouchStartX = 0;
+    let sCurrentTranslateX = 0;
+
+    sidebar.addEventListener('touchstart', (e) => {
+        sTouchStartX = e.touches[0].clientX;
+        sidebar.style.transition = 'none';
+    });
+
+    sidebar.addEventListener('touchmove', (e) => {
+        const touchX = e.touches[0].clientX;
+        const deltaX = touchX - sTouchStartX;
+
+        if (deltaX < 0) { // Só arrasta para a esquerda
+            sCurrentTranslateX = deltaX;
+            sidebar.style.transform = `translateX(${deltaX}px)`;
+        }
+    });
+
+    sidebar.addEventListener('touchend', () => {
+        sidebar.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        if (sCurrentTranslateX < -100) { // Threshold
+            closeSidebar();
+        } else {
+            sidebar.style.transform = 'translateX(0)';
+        }
+        sCurrentTranslateX = 0;
+    });
+}
+
+// Inicializa gestos nos modais
+window.addEventListener('load', () => {
+    initBottomSheetGestures(bottomSheetEdit, closeEditModal);
+    initBottomSheetGestures(bottomSheetQuick, closeQuickMenu);
+    
+    const mapModal = document.getElementById('map-modal');
+    if (mapModal) {
+        const mapSheet = mapModal.querySelector('.bottom-sheet');
+        initBottomSheetGestures(mapSheet, closeMapModal);
+    }
+
+    const postModal = document.getElementById('post-modal');
+    if (postModal) {
+        const postSheet = postModal.querySelector('.bottom-sheet');
+        initBottomSheetGestures(postSheet, closePostModal);
+    }
+
+    const viewPostModal = document.getElementById('view-post-modal');
+    if (viewPostModal) {
+        const viewPostSheet = viewPostModal.querySelector('.bottom-sheet');
+        initBottomSheetGestures(viewPostSheet, closeViewPostModal);
+    }
+
+    initSidebarGestures();
+    renderPosts();
 });

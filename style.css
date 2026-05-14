@@ -2,7 +2,27 @@
     --app-bg: #f8fafc;
     --nav-bg: #ffffff;
     --accent: #6366f1;
-    /* Indigo 500 */
+    --text-main: #1e293b;
+    --text-muted: #94a3b8;
+    --card-bg: #ffffff;
+    --border-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Variáveis de Modo Escuro */
+.dark {
+    --app-bg: #0f172a; /* Slate 900 */
+    --nav-bg: #1e293b; /* Slate 800 */
+    --accent: #818cf8; /* Indigo 400 */
+    --text-main: #f1f5f9;
+    --text-muted: #64748b;
+    --card-bg: #1e293b;
+    --border-color: rgba(255, 255, 255, 0.05);
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 body {
@@ -128,3 +148,52 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
+
+/* --- SIDEBAR --- */
+.sidebar-overlay {
+    transition: opacity 0.3s ease;
+}
+
+.sidebar {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 280px;
+    max-width: 80%;
+    z-index: 150;
+    background-color: var(--nav-bg);
+}
+
+.sidebar.active {
+    transform: translateX(0) !important;
+}
+
+/* Ajustes Globais para Temas */
+body {
+    color: var(--text-main);
+}
+
+.card {
+    background-color: var(--card-bg) !important;
+    border-color: var(--border-color) !important;
+}
+
+.app-header {
+    background: var(--nav-bg) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.bottom-nav {
+    background: var(--nav-bg) !important;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+h1, h2, h3, h4, span {
+    color: inherit;
+}
+
+/* Utilitários para Temas */
+.text-slate-800 { color: var(--text-main) !important; }
+.text-slate-700 { color: var(--text-main) !important; }
+.text-slate-400 { color: var(--text-muted) !important; }
+.bg-white { background-color: var(--card-bg) !important; }
+.bg-slate-50 { background-color: var(--app-bg) !important; }
+.bg-slate-100 { background-color: var(--app-bg) !important; }
