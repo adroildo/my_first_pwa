@@ -156,6 +156,7 @@
 
     <header class="fixed top-0 left-0 right-0 z-40 bg-[#f8fafc]/80 backdrop-blur-md px-6 pt-10 pb-4">
         <div class="flex justify-between items-center mb-4">
+
             <div class="flex items-center space-x-3">
                 <div
                     class="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-lg">
@@ -423,6 +424,37 @@
 
     <!-- MODAL DE FORMULÁRIO DA MISSÃO (TABS ELEGANTES) -->
     <div id="missionFormModal" class="fixed inset-0 z-[110] bg-slate-50 dark:bg-slate-950 hidden flex flex-col animate-fade-in">
+        <!-- Overlay de Guia de Apoio (Fundamentação) -->
+        <div id="guidanceOverlay" class="fixed inset-0 z-[120] bg-slate-900/60 backdrop-blur-sm hidden items-end justify-center p-4">
+            <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-[32px] p-8 shadow-2xl animate-slide-up">
+                <div class="w-12 h-1.5 bg-slate-200 dark:bg-white/10 rounded-full mx-auto mb-6"></div>
+                <div class="flex items-center space-x-4 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center">
+                        <i class="fa-solid fa-gavel text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Guia do Especialista</h3>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">Fundamentação e Dicas</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-6">
+                    <div>
+                        <span class="text-[9px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full uppercase tracking-widest mb-2 inline-block">Base Legal</span>
+                        <p id="guidance-legal" class="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+                    </div>
+                    <div>
+                        <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-widest mb-2 inline-block">Como Preencher</span>
+                        <p id="guidance-tips" class="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed italic"></p>
+                    </div>
+                </div>
+
+                <button onclick="toggleGuidance()" class="w-full mt-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black rounded-2xl shadow-lg tap-feedback uppercase tracking-widest">
+                    Entendi, obrigado!
+                </button>
+            </div>
+        </div>
+
         <!-- Header do Formulário -->
         <header class="h-[80px] bg-white dark:bg-slate-900 shadow-sm flex items-center px-6 justify-between flex-shrink-0">
             <button onclick="closeMissionForm()" class="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-400 flex items-center justify-center active:scale-90 transition-transform">
@@ -572,10 +604,10 @@
                 <span class="text-[9px] font-black uppercase tracking-tighter">Salvar</span>
             </button>
 
-            <!-- Botão Central: Ferramentas -->
-            <button onclick="toggleMissionTools()"
-                class="central-btn w-16 h-16 rounded-3xl bg-slate-900 text-white flex items-center justify-center text-xl tap-feedback z-10">
-                <i class="fa-solid fa-screwdriver-wrench"></i>
+            <!-- BOTÃO CENTRAL: GUIA DE APOIO -->
+            <button onclick="toggleGuidance()"
+                class="central-btn w-16 h-16 rounded-3xl bg-amber-500 text-white flex items-center justify-center text-xl shadow-[0_8px_25px_-5px_rgba(245,158,11,0.5)] active:scale-95 transition-all z-10">
+                <i class="fa-solid fa-lightbulb"></i>
             </button>
 
             <!-- Concluir -->
@@ -683,7 +715,37 @@
             document.getElementById('missionFormModal').classList.add('hidden');
         }
 
+        const guidanceData = {
+            1: { legal: "Inciso I do § 1° do art. 18 da Lei 14.133/2021", tips: "Descreva o problema sob a perspectiva do interesse público. Quanto mais detalhes, melhor para os requisitos." },
+            2: { legal: "Inciso III do § 1° do art. 18 da Lei 14.133/2021", tips: "O que é imprescindível? Considere padrões de desempenho e qualidade." },
+            3: { legal: "Inciso IV do § 1° do art. 18 da Lei 14.133/2021", tips: "Memória de cálculo é obrigatória. Justifique como chegou nestes números." },
+            4: { legal: "Inciso V do § 1° do art. 18 da Lei 14.133/2021", tips: "Analise alternativas no mercado, inclusive locação ou processos similares." },
+            5: { legal: "Inciso VI do § 1° do art. 18 da Lei 14.133/2021", tips: "Baseie-se na IN 65/2021 para preços referenciais." },
+            6: { legal: "Inciso VIII do § 1° do art. 18 da Lei 14.133/2021", tips: "Justifique se o objeto é divisível ou não (técnica e economicamente)." },
+            7: { legal: "Inciso IX do § 1° do art. 18 da Lei 14.133/2021", tips: "Foque em eficiência, economicidade e desenvolvimento sustentável." },
+            8: { legal: "Inciso X do § 1° do art. 18 da Lei 14.133/2021", tips: "Ações necessárias antes da celebração do contrato." },
+            9: { legal: "Inciso XI do § 1° do art. 18 da Lei 14.133/2021", tips: "Verifique se há dependência de outros contratos." },
+            10: { legal: "Inciso VII do § 1° do art. 18 da Lei 14.133/2021", tips: "Descrição detalhada da solução vencedora após o estudo." },
+            11: { legal: "Inciso XII do § 1° do art. 18 da Lei 14.133/2021", tips: "Medidas de mitigação e tratamento de riscos ambientais." },
+            12: { legal: "Inciso XIII do § 1° do art. 18 da Lei 14.133/2021", tips: "Parecer final motivado sobre a viabilidade da contratação." }
+        };
+
+        let currentActiveTab = 1;
+
+        function toggleGuidance() {
+            const overlay = document.getElementById('guidanceOverlay');
+            if (overlay.classList.contains('hidden')) {
+                const data = guidanceData[currentActiveTab] || { legal: "Não disponível", tips: "Selecione uma aba válida." };
+                document.getElementById('guidance-legal').innerText = data.legal;
+                document.getElementById('guidance-tips').innerText = data.tips;
+                overlay.classList.replace('hidden', 'flex');
+            } else {
+                overlay.classList.replace('flex', 'hidden');
+            }
+        }
+
         function switchTab(tabNumber) {
+            currentActiveTab = tabNumber;
             // Esconde todos os conteúdos
             document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
             // Remove active de todos os botões
@@ -697,6 +759,9 @@
             const activeBtn = document.getElementById(`tab-${tabNumber}-btn`);
             activeBtn.classList.add('text-blue-600', 'border-blue-600');
             activeBtn.classList.remove('text-slate-400', 'border-transparent');
+            
+            // Auto-scroll das abas se necessário
+            activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         }
 
         let activeMission = 1;
