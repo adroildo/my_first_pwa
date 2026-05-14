@@ -5,7 +5,7 @@ const ASSETS = [
   'manifest.json',
   'icon-512.png',
   'icon-192.png',
-  'teste.html',
+
 ];
 
 // Instalação: Cacheia os arquivos essenciais
