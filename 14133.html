@@ -314,45 +314,58 @@
                             <i class="fa-solid fa-pen-nib text-xs"></i>
                         </div>
                     </div>
-                    <div class="ml-6 w-full space-y-3">
-                        <div class="mb-3">
+                    <div class="ml-6 w-full space-y-4">
+                        <div class="mb-1">
                             <h4 class="font-bold text-sm text-slate-900">Fase 2: ETP</h4>
                             <p class="text-[11px] text-slate-500 font-medium">Estudo Técnico Preliminar</p>
                         </div>
 
-                        <!-- Card de Missão Ativo -->
-                        <div class="mission-card active">
-                            <div class="flex justify-between items-center mb-4">
-                                <div class="flex items-center">
-                                    <span class="w-2 h-2 rounded-full bg-blue-600 mr-2 status-pulse"></span>
-                                    <span class="text-[10px] font-black text-blue-900 uppercase">Estimativa de
-                                        Valor</span>
-                                </div>
-                                <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">EM
-                                    JOGO</span>
+                        <!-- MICRO MISSÃO 1: IDENTIFICAÇÃO (COMPLETA) -->
+                        <div class="mission-card completed">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 1: Identificação</span>
+                                <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
                             </div>
+                            <h5 class="text-[10px] font-bold text-slate-600 mb-2">Necessidade e Previsão no PCA</h5>
+                            <div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+                                <div class="h-full bg-emerald-500 rounded-full" style="width: 100%"></div>
+                            </div>
+                        </div>
 
+                        <!-- MICRO MISSÃO 2: SOLUÇÃO (ATIVA) -->
+                        <div class="mission-card active">
+                            <div class="flex justify-between items-center mb-3">
+                                <div class="flex items-center">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600 mr-2 status-pulse"></span>
+                                    <span class="text-[9px] font-black text-blue-900 uppercase tracking-widest">Missão 2: Solução</span>
+                                </div>
+                                <span class="text-[8px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">EM JOGO</span>
+                            </div>
+                            <h5 class="text-[10px] font-bold text-slate-800 mb-3">Requisitos e Mercado</h5>
+                            
                             <div class="mb-4">
-                                <div class="flex justify-between text-[9px] font-bold text-slate-500 mb-1">
-                                    <span>PROGRESSO DA TAREFA</span>
-                                    <span>75%</span>
+                                <div class="flex justify-between text-[8px] font-black text-slate-400 mb-1">
+                                    <span>PROGRESSO</span>
+                                    <span>40%</span>
                                 </div>
                                 <div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                                    <div class="h-full bg-blue-600 rounded-full" style="width: 75%"></div>
+                                    <div class="h-full bg-blue-600 rounded-full" style="width: 40%"></div>
                                 </div>
                             </div>
 
-                            <div class="flex justify-between items-center">
-                                <div class="flex flex-col gap-1">
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase">Início: Ontem</span>
-                                    <span class="text-[9px] font-bold text-amber-600 uppercase"><i
-                                            class="fa-solid fa-fire mr-1"></i> 24h+ em aberto</span>
-                                </div>
-                                <button onclick="playMission()"
-                                    class="px-5 py-2 bg-blue-600 text-white text-[10px] font-black rounded-xl shadow-lg tap-feedback uppercase">
-                                    Jogar
-                                </button>
+                            <button onclick="playMission(2)"
+                                class="w-full py-2.5 bg-blue-600 text-white text-[9px] font-black rounded-xl shadow-lg tap-feedback uppercase tracking-widest">
+                                Continuar
+                            </button>
+                        </div>
+
+                        <!-- MICRO MISSÃO 3: CUSTOS (BLOQUEADA) -->
+                        <div class="mission-card opacity-50 grayscale-[0.5]">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 3: Custos</span>
+                                <i class="fa-solid fa-lock text-slate-300 text-[10px]"></i>
                             </div>
+                            <h5 class="text-[10px] font-bold text-slate-400">Estimativas e Parcelamento</h5>
                         </div>
                     </div>
                 </div>
@@ -631,9 +644,11 @@
             }, 150);
         }
 
-        function playMission() {
-            // Abre o formulário da missão em vez do sucesso direto
+        function playMission(tabIndex = 1) {
+            // Abre o formulário da missão
             document.getElementById('missionFormModal').classList.remove('hidden');
+            // Troca para a aba específica da micro missão
+            switchTab(tabIndex);
         }
 
         function closeMissionForm() {
