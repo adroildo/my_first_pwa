@@ -409,7 +409,7 @@
                     </div>
                     <span class="text-[10px] font-bold text-slate-500 uppercase">Tarefa</span>
                 </button>
-                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                <button onclick="openCamera()" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
                     <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-camera"></i>
                     </div>
@@ -509,6 +509,31 @@
                 </button>
             </div>
         </div>
+    </div>
+
+    <!-- Modal de Câmera -->
+    <div id="camera-modal" class="fixed inset-0 bg-black z-[100] hidden flex flex-col">
+        <!-- Preview da Câmera -->
+        <video id="camera-video" autoplay playsinline class="w-full h-full object-cover"></video>
+        
+        <!-- Canvas oculto para captura -->
+        <canvas id="camera-canvas" class="hidden"></canvas>
+
+        <!-- Controles da Câmera -->
+        <div class="absolute bottom-10 left-0 w-full flex items-center justify-around px-10">
+            <button onclick="closeCamera()" class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <button onclick="takePhoto()" class="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-90 transition-transform">
+                <div class="w-16 h-16 bg-white rounded-full"></div>
+            </button>
+
+            <div class="w-12 h-12"></div> <!-- Espaçador para simetria -->
+        </div>
+
+        <!-- Feedback de Captura (Flash) -->
+        <div id="camera-flash" class="fixed inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-100"></div>
     </div>
 
     <script src="script.js"></script>

@@ -198,6 +198,69 @@ function checkAuth() {
     }
 }
 
+// Lógica de Câmera
+let cameraStream = null;
+
+async function openCamera() {
+    const modal = document.getElementById('camera-modal');
+    const video = document.getElementById('camera-video');
+
+    try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: 'environment' }, // Tenta usar a câmera traseira
+            audio: false 
+        });
+        video.srcObject = cameraStream;
+        modal.classList.remove('hidden');
+        closeQuickMenu(); // Fecha o menu de ações ao abrir a câmera
+    } catch (err) {
+        console.error("Erro ao acessar a câmera: ", err);
+        showAlert("Erro ao acessar a câmera. Verifique as permissões.", "fa-triangle-exclamation");
+    }
+}
+
+function closeCamera() {
+    const modal = document.getElementById('camera-modal');
+    const video = document.getElementById('camera-video');
+
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+    video.srcObject = null;
+    modal.classList.add('hidden');
+}
+
+function takePhoto() {
+    const video = document.getElementById('camera-video');
+    const canvas = document.getElementById('camera-canvas');
+    const flash = document.getElementById('camera-flash');
+
+    // Efeito de Flash
+    flash.classList.remove('opacity-0');
+    flash.classList.add('opacity-100');
+    setTimeout(() => {
+        flash.classList.remove('opacity-100');
+        flash.classList.add('opacity-0');
+    }, 100);
+
+    // Captura o frame atual do vídeo no canvas
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Converte para Base64 (poderia ser enviado para um servidor ou salvo)
+    const photoData = canvas.toDataURL('image/jpeg');
+    console.log("Foto capturada!");
+    
+    // Pequeno feedback visual e fecha após 1s (opcional)
+    setTimeout(() => {
+        showAlert("Foto capturada com sucesso!", "fa-camera");
+        closeCamera();
+    }, 500);
+}
+
 function handleLogin() {
     const user = document.getElementById('login-user').value;
     const pass = document.getElementById('login-pass').value;
