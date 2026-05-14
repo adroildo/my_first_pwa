@@ -372,7 +372,7 @@
             <div class="text-center flex flex-col items-center">
                 <div class="w-8 h-1 bg-blue-600 rounded-full mb-2 opacity-20"></div>
                 <h2 class="text-[10px] font-black text-slate-800 dark:text-white uppercase tracking-[0.2em]">Missão em Curso</h2>
-                <p class="text-[9px] font-bold text-slate-400 uppercase">Estudo Técnico Preliminar</p>
+                <p id="form-header-phase" class="text-[9px] font-bold text-slate-400 uppercase">Documento de Formalização</p>
             </div>
             <!-- Ícone Elegante de Selo -->
             <div id="mission-badge" class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center transition-all duration-500">
@@ -474,7 +474,16 @@
             </div>
 
             <!-- ... conteudos etp m1, m2, m3, m4 continuam aqui ... -->
-        </div>
+            
+            <!-- CONTEÚDO ETP M1 -->
+            <div id="mission-tab-1" class="tab-content m1-content hidden space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Descrição da Necessidade <span class="text-rose-500">*</span></label>
+                    <textarea id="field-desc" oninput="checkFormCompletion()" placeholder="Qual o problema a ser resolvido?" 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                </div>
+            </div>
+
             <div id="mission-tab-2" class="tab-content m1-content hidden space-y-4">
                 <div>
                     <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Requisitos da Contratação <span class="text-rose-500">*</span></label>
@@ -844,10 +853,14 @@
             }
         }
 
-        function playMission(missionId = 1) {
+        function playMission(missionId = 21) {
             activeMission = missionId;
             document.getElementById('missionFormModal').classList.remove('hidden');
             
+            // Título dinâmico do Header
+            const isDFD = missionId >= 21 && missionId <= 24;
+            document.getElementById('form-header-phase').innerText = isDFD ? 'Documento de Formalização' : 'Estudo Técnico Preliminar';
+
             // Gerencia abas de DFD
             document.querySelectorAll('.dfd1-tab, .dfd1-content').forEach(el => missionId === 21 ? el.classList.remove('hidden') : el.classList.add('hidden'));
             document.querySelectorAll('.dfd2-tab, .dfd2-content').forEach(el => missionId === 22 ? el.classList.remove('hidden') : el.classList.add('hidden'));
