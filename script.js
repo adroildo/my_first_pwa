@@ -309,25 +309,42 @@ function saveLocation(lat, lng) {
 
 function openMapModal() {
     const modal = document.getElementById('map-modal');
+    const sheet = modal.querySelector('.bottom-sheet');
     modal.classList.remove('hidden');
+    
+    // Animação de subida
+    setTimeout(() => sheet.classList.add('active'), 10);
+    
     closeQuickMenu();
 
     // Inicializa o mapa Leaflet
     setTimeout(() => {
         if (!leafletMap) {
-            leafletMap = L.map('map').setView([0, 0], 2);
+            leafletMap = L.map('map', {
+                zoomControl: false // Desativa botões de zoom para visual limpo
+            }).setView([0, 0], 2);
+            
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(leafletMap);
         }
+        
+        // Garante que o Leaflet recalcule o tamanho após o modal abrir
+        leafletMap.invalidateSize();
         renderMarkers();
-    }, 100);
+    }, 400); // Espera a animação do bottom sheet
 }
 
 function renderMarkers() {
     if (!leafletMap) return;
 
-    // Limpa marcadores existentes (opcional, ou apenas adiciona os novos)
+    // Limpa marcadores existentes para evitar duplicatas ao reabrir
+    leafletMap.eachLayer((layer) => {
+        if (layer instanceof L.Marker) {
+            leafletMap.removeLayer(layer);
+        }
+    });
+
     const history = JSON.parse(localStorage.getItem('checkin_history') || '[]');
     
     if (history.length > 0) {
@@ -345,7 +362,11 @@ function renderMarkers() {
 }
 
 function closeMapModal() {
-    document.getElementById('map-modal').classList.add('hidden');
+    const modal = document.getElementById('map-modal');
+    const sheet = modal.querySelector('.bottom-sheet');
+    
+    sheet.classList.remove('active');
+    setTimeout(() => modal.classList.add('hidden'), 300);
 }
 
 function clearCheckInHistory() {

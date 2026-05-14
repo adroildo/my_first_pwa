@@ -540,23 +540,43 @@
         <div id="camera-flash" class="fixed inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-100"></div>
     </div>
 
-    <!-- Modal de Mapa Histórico -->
-    <div id="map-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[110] hidden flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-lg h-[80vh] rounded-[2.5rem] overflow-hidden flex flex-col shadow-2xl animate-bounce-in">
-            <div class="p-6 flex justify-between items-center border-b border-slate-50">
-                <h2 class="text-xl font-black text-slate-800">Histórico de Locais</h2>
-                <button onclick="closeMapModal()" class="w-10 h-10 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center active:scale-90 transition-transform">
-                    <i class="fa-solid fa-xmark"></i>
+    <!-- Modal de Mapa Histórico (Bottom Sheet Style) -->
+    <div id="map-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] hidden flex items-end">
+        <div class="bottom-sheet bg-white w-full h-[85vh] rounded-t-[3rem] overflow-hidden flex flex-col shadow-[0_-20px_50px_rgba(0,0,0,0.1)] relative">
+            
+            <!-- Barra de Arraste (Handle) -->
+            <div class="w-full flex justify-center pt-4 pb-2">
+                <div class="w-12 h-1.5 bg-slate-200 rounded-full"></div>
+            </div>
+
+            <div class="px-8 py-4 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800 tracking-tight">Mapa Histórico</h2>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Seus locais registrados</p>
+                </div>
+                <button onclick="closeMapModal()" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center active:scale-90 transition-transform">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
             
             <!-- Container do Mapa -->
-            <div id="map" class="flex-1 w-full bg-slate-50"></div>
+            <div id="map" class="flex-1 w-full bg-slate-50 border-y border-slate-50"></div>
 
-            <div class="p-6 bg-slate-50">
-                <button onclick="clearCheckInHistory()" class="w-full py-3 text-xs font-bold text-red-500 uppercase tracking-widest active:scale-95 transition-transform">
-                    <i class="fa-solid fa-trash-can mr-2"></i>Limpar Histórico
+            <!-- Footer do Mapa -->
+            <div class="p-8 pb-12 bg-white flex items-center justify-between">
+                <button onclick="clearCheckInHistory()" class="flex items-center space-x-2 text-slate-400 active:text-red-500 transition-colors">
+                    <i class="fa-solid fa-trash-can text-sm"></i>
+                    <span class="text-[10px] font-black uppercase tracking-widest">Limpar Tudo</span>
                 </button>
+                
+                <div class="flex -space-x-2">
+                    <div class="w-8 h-8 rounded-full border-2 border-white bg-indigo-100 flex items-center justify-center text-[10px] font-bold text-indigo-600">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <div class="w-8 h-8 rounded-full border-2 border-white bg-emerald-100 flex items-center justify-center text-[10px] font-bold text-emerald-600 font-black">
+                        +
+                    </div>
+                </div>
             </div>
         </div>
     </div>
