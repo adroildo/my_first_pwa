@@ -1087,79 +1087,132 @@ function useHint() {
     showAlert('Dica usada! -50 moedas', 'fa-lightbulb');
 }
 
-// Lógica de Automação de Documentos
-const docModal = document.getElementById('doc-modal');
-const docSheet = docModal ? docModal.querySelector('.bottom-sheet') : null;
+// Lógica de Automação de Documentos (Full Screen Wizard)
+let currentWizardStep = 1;
+const totalWizardSteps = 3;
 
 function openDocForm(docType) {
     closeQuickMenu();
     
-    // Configura o título do modal baseado no tipo
+    // Configura o título do documento
     const titleMap = {
-        'memorando': 'Novo Memorando',
-        'oficio': 'Novo Ofício',
-        'requisicao': 'Nova Requisição',
-        'relatorio': 'Novo Relatório'
+        'memorando': 'Memorando',
+        'oficio': 'Ofício',
+        'requisicao': 'Requisição',
+        'relatorio': 'Relatório'
     };
     
-    document.getElementById('doc-modal-title').innerText = titleMap[docType] || 'Novo Documento';
-    document.getElementById('doc-modal-subtitle').innerText = `Metadados para ${docType}`;
+    document.getElementById('wizard-title').innerText = titleMap[docType] || 'Novo Documento';
     
-    // Limpa campos
-    document.getElementById('doc-title').value = '';
-    document.getElementById('doc-number').value = '';
-    document.getElementById('doc-signer').value = localStorage.getItem('user_name') || '';
-    document.getElementById('doc-origin').value = '';
-    document.getElementById('doc-destination').value = '';
-
-    openDocModal();
+    // Limpa campos e reseta Wizard
+    resetWizard();
+    
+    // Mostra a seção
+    document.getElementById('doc-section').classList.remove('hidden');
 }
 
-function openDocModal() {
-    docModal.classList.remove('hidden');
-    setTimeout(() => docSheet.classList.add('active'), 10);
+function closeDocSection() {
+    document.getElementById('doc-section').classList.add('hidden');
 }
 
-function closeDocModal() {
-    docSheet.classList.remove('active');
-    setTimeout(() => {
-        docModal.classList.add('hidden');
-        docSheet.style.transform = '';
-    }, 300);
+function resetWizard() {
+    currentWizardStep = 1;
+    document.getElementById('w-doc-number').value = '';
+    document.getElementById('w-doc-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('w-doc-title').value = '';
+    document.getElementById('w-doc-origin').value = '';
+    document.getElementById('w-doc-destination').value = '';
+    document.getElementById('w-doc-signer').value = localStorage.getItem('user_name') || '';
+    
+    updateWizardUI();
 }
 
-function generateDocJson() {
-    const data = {
-        tipo: document.getElementById('doc-modal-title').innerText,
-        titulo: document.getElementById('doc-title').value,
-        numero: document.getElementById('doc-number').value,
-        assinante: document.getElementById('doc-signer').value,
-        origem: document.getElementById('doc-origin').value,
-        destino: document.getElementById('doc-destination').value,
-        data_criacao: new Date().toISOString()
-    };
+function changeStep(delta) {
+    const nextStep = currentWizardStep + delta;
+    
+    // Validação básica ao avançar
+    if (delta > 0) {
+        if (currentWizardStep === 1) {
+            const num = document.getElementById('w-doc-number').value;
+            if (!num) return showAlert("Informe o número do documento!");
+        }
+        if (currentWizardStep === 2) {
+            const title = document.getElementById('w-doc-title').value;
+            if (!title) return showAlert("Informe o assunto!");
+        }
+    }
 
-    if (!data.titulo || !data.numero) {
-        showAlert("Preencha ao menos o Título e o Número!", "fa-triangle-exclamation");
+    // Se estiver no último passo e clicar em avançar, gera o JSON
+    if (nextStep > totalWizardSteps) {
+        generateWizardJson();
         return;
     }
 
-    console.log("JSON Gerado:", JSON.stringify(data, null, 2));
+    if (nextStep >= 1 && nextStep <= totalWizardSteps) {
+        currentWizardStep = nextStep;
+        updateWizardUI();
+    }
+}
+
+function updateWizardUI() {
+    // Esconde todos os passos
+    document.querySelectorAll('.wizard-step').forEach(step => step.classList.add('hidden'));
     
-    // Simulação de salvamento
+    // Mostra o passo atual
+    document.getElementById(`step-${currentWizardStep}`).classList.remove('hidden');
+    
+    // Atualiza indicadores
+    document.getElementById('wizard-step-indicator').innerText = `Passo ${currentWizardStep} de ${totalWizardSteps}`;
+    const progress = (currentWizardStep / totalWizardSteps) * 100;
+    document.getElementById('wizard-progress').style.width = `${progress}%`;
+    
+    // Controles
+    const prevBtn = document.getElementById('prev-step');
+    const nextBtn = document.getElementById('next-step');
+    const nextBtnSpan = nextBtn.querySelector('span');
+
+    if (currentWizardStep === 1) {
+        prevBtn.classList.add('opacity-0', 'pointer-events-none');
+    } else {
+        prevBtn.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    if (currentWizardStep === totalWizardSteps) {
+        nextBtnSpan.innerText = 'Finalizar e Gerar';
+        nextBtn.classList.replace('bg-indigo-600', 'bg-emerald-600');
+    } else {
+        nextBtnSpan.innerText = 'Avançar';
+        nextBtn.classList.replace('bg-emerald-600', 'bg-indigo-600');
+    }
+}
+
+function generateWizardJson() {
+    const data = {
+        tipo: document.getElementById('wizard-title').innerText,
+        numero: document.getElementById('w-doc-number').value,
+        data_emissao: document.getElementById('w-doc-date').value,
+        assunto: document.getElementById('w-doc-title').value,
+        origem: document.getElementById('w-doc-origin').value,
+        destino: document.getElementById('w-doc-destination').value,
+        assinante: document.getElementById('w-doc-signer').value,
+        data_geracao: new Date().toISOString()
+    };
+
+    console.log("JSON Gerado via Wizard:", data);
+    
+    // Salvamento Local
     const docs = JSON.parse(localStorage.getItem('saved_docs') || '[]');
     docs.unshift(data);
     localStorage.setItem('saved_docs', JSON.stringify(docs));
 
-    showAlert("JSON gerado e salvo localmente!", "fa-file-code");
-    closeDocModal();
+    // Feedback e Download
+    showAlert("Documento gerado com sucesso!", "fa-check-double");
     
-    // Opcional: Download do JSON
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `doc_${data.numero.replace('/', '-')}.json`);
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", `${data.tipo}_${data.numero.replace('/', '-')}.json`);
+    dlAnchor.click();
+
+    setTimeout(closeDocSection, 1500);
 }

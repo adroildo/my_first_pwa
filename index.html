@@ -336,89 +336,112 @@
             </div>
         </div>
 
-        <!-- SEÇÃO: PERFIL -->
-        <div id="perfil-section" class="page-section hidden px-6 space-y-8">
-            <div class="flex flex-col items-center pt-8">
-                <div class="relative">
-                    <div class="w-28 h-28 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 p-1 shadow-xl">
-                        <div
-                            class="w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
-                            <img id="profile-img" src="https://i.pravatar.cc/300" alt="Avatar"
-                                class="w-full h-full object-cover">
-                        </div>
-                    </div>
-                    <div class="absolute bottom-1 right-1 w-8 h-8 bg-indigo-600 rounded-full border-4 border-white flex items-center justify-center text-white text-[10px] active:scale-90 transition-transform cursor-pointer"
-                        onclick="document.getElementById('file-input').click()">
-                        <i class="fa-solid fa-camera"></i>
-                    </div>
-                    <input type="file" id="file-input" class="hidden" accept="image/*"
-                        onchange="handleImageUpload(event)">
+        <!-- SEÇÃO: AUTOMAÇÃO DE DOCUMENTOS (Full Screen Wizard) -->
+        <div id="doc-section" class="page-section hidden fixed inset-0 z-[140] bg-slate-50 dark:bg-slate-950 flex flex-col">
+            <!-- Header do Wizard -->
+            <header class="h-[70px] bg-white dark:bg-slate-900 shadow-sm flex items-center px-6 justify-between flex-shrink-0">
+                <button onclick="closeDocSection()" class="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-400 flex items-center justify-center active:scale-90 transition-transform">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="text-center">
+                    <h2 id="wizard-title" class="text-lg font-black text-slate-800 dark:text-white leading-tight">Novo Documento</h2>
+                    <p id="wizard-step-indicator" class="text-[10px] font-bold text-indigo-500 uppercase tracking-widest">Passo 1 de 3</p>
                 </div>
-                <h3 id="display-name" class="mt-4 text-xl font-black text-slate-800">Usuário Premium</h3>
-                <div class="flex items-center space-x-2">
-                    <p id="display-username" class="text-slate-400 text-sm font-medium">@usuario_premium</p>
-                    <button onclick="openEditModal()"
-                        class="text-indigo-500 text-xs font-bold uppercase tracking-widest">Editar</button>
-                </div>
+                <div class="w-12"></div> <!-- Spacer -->
+            </header>
+
+            <!-- Barra de Progresso do Wizard -->
+            <div class="h-1 w-full bg-slate-100 dark:bg-white/5">
+                <div id="wizard-progress" class="h-full bg-indigo-500 w-1/3 transition-all duration-500"></div>
             </div>
 
-            <!-- Stats -->
-            <div class="grid grid-cols-3 gap-4">
-                <div class="card p-4 rounded-3xl text-center">
-                    <p class="text-lg font-black text-slate-800">12</p>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Projetos</p>
-                </div>
-                <div class="card p-4 rounded-3xl text-center border-indigo-100 bg-indigo-50/30">
-                    <p class="text-lg font-black text-indigo-600">Premium</p>
-                    <p class="text-[10px] text-indigo-400 font-bold uppercase tracking-tighter">Plano</p>
-                </div>
-                <div class="card p-4 rounded-3xl text-center">
-                    <p class="text-lg font-black text-slate-800">84</p>
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Tarefas</p>
-                </div>
-            </div>
-
-            <!-- Menu Opções -->
-            <div class="space-y-3">
-                <div
-                    class="card p-4 rounded-3xl flex items-center justify-between active:bg-slate-50 transition-colors">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500">
-                            <i class="fa-solid fa-gear"></i>
-                        </div>
-                        <span class="font-bold text-slate-700">Configurações</span>
+            <!-- Conteúdo das Etapas -->
+            <div class="flex-1 overflow-y-auto p-6">
+                
+                <!-- PASSO 1: Identificação -->
+                <div id="step-1" class="wizard-step space-y-6">
+                    <div class="pt-2">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white">Identificação</h3>
+                        <p class="text-slate-400 text-sm font-medium">Defina os dados básicos do documento.</p>
                     </div>
-                    <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-                </div>
-                <div
-                    class="card p-4 rounded-3xl flex items-center justify-between active:bg-slate-50 transition-colors">
-                    <div class="flex items-center space-x-4">
-                        <div
-                            class="w-10 h-10 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-500">
-                            <i class="fa-solid fa-credit-card"></i>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Número do Documento</label>
+                            <input type="text" id="w-doc-number" placeholder="Ex: 001/2024"
+                                class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
                         </div>
-                        <span class="font-bold text-slate-700">Pagamento</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
-                </div>
-                <div class="card p-4 rounded-3xl flex items-center justify-between active:bg-red-50 border-red-50 transition-colors"
-                    onclick="handleLogout()">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-10 h-10 rounded-2xl bg-red-100 flex items-center justify-center text-red-500">
-                            <i class="fa-solid fa-power-off"></i>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Data de Emissão</label>
+                            <input type="date" id="w-doc-date"
+                                class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
                         </div>
-                        <span class="font-bold text-red-500">Sair da Conta</span>
                     </div>
                 </div>
 
-                <!-- BOTÃO DEV: LIMPAR CACHE -->
-                <div class="mt-8 p-4 border-2 border-dashed border-slate-200 rounded-3xl text-center active:bg-slate-50 transition-colors" onclick="clearAppCache()">
-                    <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Área do Desenvolvedor</p>
-                    <span class="text-xs font-bold text-slate-600">
-                        <i class="fa-solid fa-broom mr-2"></i>Limpar Cache e Forçar Update
-                    </span>
+                <!-- PASSO 2: Endereçamento -->
+                <div id="step-2" class="wizard-step hidden space-y-6">
+                    <div class="pt-2">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white">Endereçamento</h3>
+                        <p class="text-slate-400 text-sm font-medium">Para quem e de onde vem o documento?</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Título / Assunto</label>
+                            <input type="text" id="w-doc-title" placeholder="Assunto do documento"
+                                class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Origem</label>
+                                <input type="text" id="w-doc-origin" placeholder="Setor A"
+                                    class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Destino</label>
+                                <input type="text" id="w-doc-destination" placeholder="Setor B"
+                                    class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- PASSO 3: Assinatura -->
+                <div id="step-3" class="wizard-step hidden space-y-6">
+                    <div class="pt-2">
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white">Assinatura</h3>
+                        <p class="text-slate-400 text-sm font-medium">Quem será o responsável legal?</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Quem Assina</label>
+                            <input type="text" id="w-doc-signer" placeholder="Nome do Assinante"
+                                class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
+                        </div>
+                        <div class="p-6 bg-indigo-50 dark:bg-indigo-500/10 rounded-[2rem] border-2 border-dashed border-indigo-200 dark:border-indigo-500/20 text-center">
+                            <i class="fa-solid fa-cloud-arrow-up text-indigo-500 text-2xl mb-2"></i>
+                            <p class="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase">Resumo Gerado Automaticamente</p>
+                            <p class="text-xs text-indigo-400 dark:text-indigo-300 mt-1">O JSON será formatado para integração direta com o Google Docs.</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
+            <!-- Rodapé do Wizard (Controles) -->
+            <footer class="p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-white/5 flex items-center justify-between flex-shrink-0">
+                <button id="prev-step" onclick="changeStep(-1)" class="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-400 flex items-center justify-center active:scale-90 transition-all opacity-0 pointer-events-none">
+                    <i class="fa-solid fa-chevron-left text-xl"></i>
+                </button>
+                
+                <button id="next-step" onclick="changeStep(1)" 
+                    class="flex-1 ml-4 h-14 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-indigo-100 dark:shadow-none active:scale-95 transition-all flex items-center justify-center space-x-2">
+                    <span>Avançar</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </footer>
         </div>
     </div>
 
@@ -731,70 +754,6 @@
                 <span>Próxima</span>
                 <i class="fa-solid fa-arrow-right text-xs"></i>
             </button>
-        </div>
-    </div>
-
-    <!-- Modal de Formulário de Documento (Automation Pro) -->
-    <div id="doc-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] hidden flex items-end">
-        <div class="bottom-sheet bg-white dark:bg-slate-900 w-full rounded-t-[3rem] overflow-hidden flex flex-col shadow-[0_-20px_50px_rgba(0,0,0,0.1)] relative">
-            
-            <!-- Barra de Arraste -->
-            <div class="w-full flex justify-center pt-4 pb-2">
-                <div class="w-12 h-1.5 bg-slate-200 dark:bg-white/10 rounded-full"></div>
-            </div>
-
-            <div class="px-8 py-4 flex justify-between items-center">
-                <div>
-                    <h2 id="doc-modal-title" class="text-2xl font-black text-slate-800 dark:text-white tracking-tight">Novo Documento</h2>
-                    <p id="doc-modal-subtitle" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Preencha os metadados</p>
-                </div>
-                <button onclick="closeDocModal()" class="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-400 flex items-center justify-center active:scale-90 transition-transform">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="px-8 py-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                <!-- Grid de Inputs -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="col-span-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Endereçamento / Título</label>
-                        <input type="text" id="doc-title" placeholder="Ex: Ao Diretor de Logística"
-                            class="w-full bg-slate-50 dark:bg-white/5 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                    </div>
-                    
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Número</label>
-                        <input type="text" id="doc-number" placeholder="001/2024"
-                            class="w-full bg-slate-50 dark:bg-white/5 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                    </div>
-
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Assinatura</label>
-                        <input type="text" id="doc-signer" placeholder="Nome do Responsável"
-                            class="w-full bg-slate-50 dark:bg-white/5 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                    </div>
-
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Origem</label>
-                        <input type="text" id="doc-origin" placeholder="Setor de Origem"
-                            class="w-full bg-slate-50 dark:bg-white/5 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                    </div>
-
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Destino</label>
-                        <input type="text" id="doc-destination" placeholder="Setor de Destino"
-                            class="w-full bg-slate-50 dark:bg-white/5 border-0 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-                    </div>
-                </div>
-
-                <button onclick="generateDocJson()" 
-                    class="w-full py-5 bg-indigo-600 text-white rounded-[2rem] font-black uppercase tracking-widest shadow-lg shadow-indigo-200 dark:shadow-none active:scale-95 transition-all flex items-center justify-center space-x-3">
-                    <i class="fa-solid fa-file-export"></i>
-                    <span>Gerar JSON de Automação</span>
-                </button>
-            </div>
-
-            <div class="h-8"></div> <!-- Spacer bottom -->
         </div>
     </div>
 
