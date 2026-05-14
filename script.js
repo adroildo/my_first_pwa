@@ -98,6 +98,91 @@ function initBottomSheetGestures(sheet, closeFn) {
     });
 }
 
+// Lógica de Novo Post
+function openPostModal() {
+    const modal = document.getElementById('post-modal');
+    const sheet = modal.querySelector('.bottom-sheet');
+    modal.classList.remove('hidden');
+    setTimeout(() => sheet.classList.add('active'), 10);
+    closeQuickMenu();
+}
+
+function closePostModal() {
+    const modal = document.getElementById('post-modal');
+    const sheet = modal.querySelector('.bottom-sheet');
+    sheet.classList.remove('active');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        sheet.style.transform = '';
+    }, 300);
+}
+
+function handleCreatePost() {
+    const content = document.getElementById('post-content').value;
+    if (!content.trim()) {
+        showAlert("Escreva algo antes de publicar!", "fa-triangle-exclamation");
+        return;
+    }
+
+    const newPost = {
+        id: Date.now(),
+        content: content,
+        author: localStorage.getItem('user_name') || 'Usuário Premium',
+        date: 'Agora mesmo',
+        icon: 'fa-message',
+        color: 'indigo'
+    };
+
+    // Salva no LocalStorage
+    let posts = JSON.parse(localStorage.getItem('user_posts') || '[]');
+    posts.unshift(newPost);
+    localStorage.setItem('user_posts', JSON.stringify(posts));
+
+    // Feedback e Reset
+    document.getElementById('post-content').value = '';
+    closePostModal();
+    showAlert("Postado com sucesso!", "fa-check-circle");
+    renderPosts();
+}
+
+function renderPosts() {
+    const container = document.getElementById('posts-container');
+    if (!container) return;
+
+    // Mantém o cabeçalho "Recentes"
+    const header = `
+        <div class="flex justify-between items-center px-1">
+            <span class="font-bold text-slate-800">Recentes</span>
+            <a href="#" class="text-xs font-bold text-indigo-500 uppercase tracking-widest">Ver tudo</a>
+        </div>
+    `;
+
+    let posts = JSON.parse(localStorage.getItem('user_posts') || '[]');
+    
+    // Se não houver posts, mostra alguns placeholders
+    if (posts.length === 0) {
+        posts = [
+            { content: "Bem-vindo ao seu novo feed dinâmico!", author: "Sistema", date: "Há 1 min", icon: "fa-rocket", color: "emerald" },
+            { content: "Explore as funcionalidades do Menu Rápido.", author: "Guia", date: "Há 5 min", icon: "fa-lightbulb", color: "amber" }
+        ];
+    }
+
+    const postsHtml = posts.map(post => `
+        <div class="card p-4 rounded-3xl flex items-center space-x-4 animate-fade-in">
+            <div class="w-12 h-12 bg-${post.color || 'slate'}-100 rounded-2xl flex items-center justify-center text-${post.color || 'slate'}-500">
+                <i class="fa-solid ${post.icon || 'fa-image'}"></i>
+            </div>
+            <div class="flex-1">
+                <h4 class="font-bold text-slate-800 text-sm line-clamp-1">${post.content}</h4>
+                <p class="text-[10px] text-slate-400 font-medium">${post.author} • ${post.date}</p>
+            </div>
+            <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+        </div>
+    `).join('');
+
+    container.innerHTML = header + postsHtml;
+}
+
 // Inicializa gestos nos modais
 window.addEventListener('load', () => {
     initBottomSheetGestures(bottomSheetEdit, closeEditModal);
@@ -108,6 +193,14 @@ window.addEventListener('load', () => {
         const mapSheet = mapModal.querySelector('.bottom-sheet');
         initBottomSheetGestures(mapSheet, closeMapModal);
     }
+
+    const postModal = document.getElementById('post-modal');
+    if (postModal) {
+        const postSheet = postModal.querySelector('.bottom-sheet');
+        initBottomSheetGestures(postSheet, closePostModal);
+    }
+
+    renderPosts();
 });
 
 function toggleMoreOptions(showMore) {

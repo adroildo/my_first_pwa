@@ -248,7 +248,7 @@
             </div>
 
             <!-- Content List -->
-            <div class="space-y-4">
+            <div id="posts-container" class="space-y-4">
                 <div class="flex justify-between items-center px-1">
                     <span class="font-bold text-slate-800">Recentes</span>
                     <a href="#" class="text-xs font-bold text-indigo-500 uppercase tracking-widest">Ver tudo</a>
@@ -401,7 +401,7 @@
 
             <!-- PÁGINA 1 -->
             <div id="quick-page-1" class="grid grid-cols-3 gap-4 transition-all duration-300">
-                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                <button onclick="openPostModal()" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
                     <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-xl">
                         <i class="fa-solid fa-pen-to-square"></i>
                     </div>
@@ -578,6 +578,43 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal de Novo Post (Bottom Sheet) -->
+    <div id="post-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[110] hidden flex items-end">
+        <div class="bottom-sheet bg-white w-full rounded-t-[3rem] overflow-hidden flex flex-col shadow-[0_-20px_50px_rgba(0,0,0,0.1)] relative">
+            
+            <div class="w-full flex justify-center pt-4 pb-2">
+                <div class="w-12 h-1.5 bg-slate-200 rounded-full"></div>
+            </div>
+
+            <div class="px-8 py-4 flex justify-between items-center">
+                <h2 class="text-2xl font-black text-slate-800 tracking-tight">Criar Postagem</h2>
+                <button onclick="closePostModal()" class="w-10 h-10 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="px-8 py-6 space-y-6">
+                <textarea id="post-content" 
+                    placeholder="O que você está pensando?" 
+                    class="w-full h-32 bg-slate-50 rounded-3xl p-6 text-slate-700 font-medium placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 border-0 resize-none"></textarea>
+                
+                <div class="flex items-center space-x-4">
+                    <button onclick="openCamera()" class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center active:scale-90 transition-transform">
+                        <i class="fa-solid fa-camera"></i>
+                    </button>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Adicionar Foto</span>
+                </div>
+
+                <button onclick="handleCreatePost()" 
+                    class="w-full py-5 bg-indigo-600 text-white rounded-3xl font-black uppercase tracking-widest shadow-lg shadow-indigo-200 active:scale-95 transition-all">
+                    Publicar Agora
+                </button>
+            </div>
+
+            <div class="h-10"></div> <!-- Espaçador para o teclado mobile -->
         </div>
     </div>
 
