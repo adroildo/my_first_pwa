@@ -730,7 +730,7 @@
     <div id="quiz-modal" class="fixed inset-0 bg-slate-50 dark:bg-slate-950 z-[150] hidden flex flex-col overflow-hidden">
         
         <!-- Header: Stats & Progress -->
-        <div class="px-6 pt-14 pb-4 bg-white dark:bg-slate-900 shadow-sm flex flex-col space-y-4">
+        <div class="px-6 pt-14 pb-2 bg-white dark:bg-slate-900 shadow-sm flex flex-col space-y-4">
             <div class="flex justify-between items-center">
                 <button onclick="closeQuiz()" class="text-slate-400 active:scale-90 transition-transform">
                     <i class="fa-solid fa-chevron-left text-xl"></i>
@@ -754,9 +754,9 @@
         </div>
 
         <!-- Body: Question & Answers -->
-        <div class="flex-1 overflow-y-auto px-6 py-8 flex flex-col">
-            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-sm mb-8 border border-slate-100 dark:border-white/5">
-                <span class="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-4 block">Pergunta Atual</span>
+        <div class="flex-1 overflow-y-auto px-6 py-4 flex flex-col">
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] shadow-sm mb-6 border border-slate-100 dark:border-white/5">
+                <span class="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-2 block">Pergunta Atual</span>
                 <h3 id="quiz-question" class="text-2xl font-black text-slate-800 dark:text-white leading-tight">Preparando sua missão...</h3>
             </div>
 
@@ -766,7 +766,7 @@
         </div>
 
         <!-- Footer Fixo: Dicas & Avançar -->
-        <div class="px-6 py-8 pb-12 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
+        <div class="px-6 pt-4 pb-12 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
             <button onclick="useHint()" class="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-white/5 text-amber-500 flex items-center justify-center active:scale-90 transition-all shadow-inner">
                 <i class="fa-solid fa-lightbulb text-xl"></i>
             </button>
