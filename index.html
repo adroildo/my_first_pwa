@@ -730,8 +730,8 @@
     <div id="quiz-modal" class="fixed inset-0 bg-slate-50 dark:bg-slate-950 z-[150] hidden flex flex-col overflow-hidden">
         
         <!-- Header: Stats & Progress -->
-        <div class="px-6 pt-14 pb-2 bg-white dark:bg-slate-900 shadow-sm flex flex-col space-y-4">
-            <div class="flex justify-between items-center">
+        <div class="bg-white dark:bg-slate-900 shadow-sm flex flex-col">
+            <div class="px-6 h-[70px] flex justify-between items-center">
                 <button onclick="closeQuiz()" class="text-slate-400 active:scale-90 transition-transform">
                     <i class="fa-solid fa-chevron-left text-xl"></i>
                 </button>
@@ -748,8 +748,10 @@
                 <div class="w-8"></div> <!-- Spacer -->
             </div>
             
-            <div class="h-2 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
-                <div id="quiz-progress" class="h-full bg-indigo-500 w-0 transition-all duration-500"></div>
+            <div class="px-6 pb-4">
+                <div class="h-1.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                    <div id="quiz-progress" class="h-full bg-indigo-500 w-0 transition-all duration-500"></div>
+                </div>
             </div>
         </div>
 
