@@ -309,7 +309,7 @@
 
                 <!-- Fase 2: ETP -->
                 <div class="relative flex items-start">
-                    <div class="progress-circle shadow-md shrink-0" style="--percent: 25%; --progress-color: #2563eb;">
+                    <div class="progress-circle shadow-md shrink-0" style="--percent: 0%; --progress-color: #2563eb;">
                         <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center z-10">
                             <i class="fa-solid fa-pen-nib text-xs"></i>
                         </div>
@@ -320,50 +320,20 @@
                             <p class="text-[11px] text-slate-500 font-medium">Estudo Técnico Preliminar</p>
                         </div>
 
-                        <!-- MICRO MISSÃO 1: NECESSIDADE (COMPLETA) -->
-                        <div class="mission-card completed">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 1: Necessidade</span>
-                                <i class="fa-solid fa-circle-check text-emerald-500 text-xs"></i>
-                            </div>
-                            <h5 class="text-[10px] font-bold text-slate-600 mb-2">Requisitos e Quantitativos</h5>
-                            <div class="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-emerald-500 rounded-full" style="width: 100%"></div>
-                            </div>
-                        </div>
-
-                        <!-- MICRO MISSÃO 2: MERCADO (ATIVA) -->
+                        <!-- MICRO MISSÃO 1: IDENTIFICAÇÃO (ATIVA) -->
                         <div class="mission-card active">
                             <div class="flex justify-between items-center mb-3">
                                 <div class="flex items-center">
                                     <span class="w-1.5 h-1.5 rounded-full bg-blue-600 mr-2 status-pulse"></span>
-                                    <span class="text-[9px] font-black text-blue-900 uppercase tracking-widest">Missão 2: Mercado</span>
+                                    <span class="text-[9px] font-black text-blue-900 uppercase tracking-widest">Missão 1: Identificação</span>
                                 </div>
                                 <span class="text-[8px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">EM JOGO</span>
                             </div>
-                            <h5 class="text-[10px] font-bold text-slate-800 mb-3">Pesquisa de Preços e Parcelamento</h5>
-                            <button onclick="playMission(2)"
+                            <h5 class="text-[10px] font-bold text-slate-800 mb-3">Necessidade, Requisitos e Quantitativos</h5>
+                            <button onclick="playMission(1)"
                                 class="w-full py-2.5 bg-blue-600 text-white text-[9px] font-black rounded-xl shadow-lg tap-feedback uppercase tracking-widest">
-                                Iniciar Estudo
+                                Iniciar Missão
                             </button>
-                        </div>
-
-                        <!-- MICRO MISSÃO 3: ESTRATÉGIA (BLOQUEADA) -->
-                        <div class="mission-card opacity-50 grayscale-[0.5]">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 3: Estratégia</span>
-                                <i class="fa-solid fa-lock text-slate-300 text-[10px]"></i>
-                            </div>
-                            <h5 class="text-[10px] font-bold text-slate-400">Resultados e Providências</h5>
-                        </div>
-
-                        <!-- MICRO MISSÃO 4: VIABILIDADE (BLOQUEADA) -->
-                        <div class="mission-card opacity-50 grayscale-[0.5]">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Missão 4: Viabilidade</span>
-                                <i class="fa-solid fa-lock text-slate-300 text-[10px]"></i>
-                            </div>
-                            <h5 class="text-[10px] font-bold text-slate-400">Impactos e Parecer Final</h5>
                         </div>
                     </div>
                 </div>
@@ -430,95 +400,45 @@
             </div>
         </header>
 
-        <!-- Navegação por Abas (Scrollable) -->
-        <div class="flex px-6 pt-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-white/5 overflow-x-auto no-scrollbar">
-            <button onclick="switchTab(1)" id="tab-1-btn" class="mission-tab active pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap">1. Necessidade</button>
-            <button onclick="switchTab(2)" id="tab-2-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap">2. Mercado</button>
-            <button onclick="switchTab(3)" id="tab-3-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap">3. Estratégia</button>
-            <button onclick="switchTab(4)" id="tab-4-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap">4. Viabilidade</button>
+        <!-- Navegação por Abas -->
+        <div class="flex px-6 pt-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-white/5">
+            <button onclick="switchTab(1)" id="tab-1-btn" class="mission-tab active pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap flex-1">1. Necessidade</button>
+            <button onclick="switchTab(2)" id="tab-2-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">2. Requisitos</button>
+            <button onclick="switchTab(3)" id="tab-3-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap flex-1">3. Quantitativos</button>
         </div>
 
         <!-- Conteúdo das Abas -->
         <div class="flex-1 overflow-y-auto p-6 space-y-6">
-            <!-- TAB 1: NECESSIDADE (Micro Fase 1) -->
+            <!-- TAB 1: NECESSIDADE -->
             <div id="mission-tab-1" class="tab-content space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">1. Descrição da Necessidade <span class="text-rose-500">*</span></label>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Descrição da Necessidade <span class="text-rose-500">*</span></label>
                     <textarea id="field-desc" oninput="checkFormCompletion()" placeholder="Qual o problema a ser resolvido?" 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">2. Previsão no PCA</label>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Previsão no PCA</label>
                     <select class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white outline-none">
                         <option>Sim, previsto no Plano Anual</option>
                         <option>Não previsto (necessita justificativa)</option>
                     </select>
                 </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">3. Requisitos da Contratação</label>
-                    <textarea placeholder="Requisitos necessários e suficientes..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-20 resize-none"></textarea>
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">4. Estimativa de Quantidades</label>
-                    <textarea placeholder="Memória de cálculo e quantitativos..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-20 resize-none"></textarea>
-                </div>
             </div>
 
-            <!-- TAB 2: MERCADO (Micro Fase 2) -->
+            <!-- TAB 2: REQUISITOS -->
             <div id="mission-tab-2" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">5. Levantamento de Mercado</label>
-                    <textarea placeholder="Prospecção e análise de alternativas..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">6. Estimativa de Custos</label>
-                    <textarea placeholder="Preços unitários e valor total estimado..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">8. Justificativa de Parcelamento <span class="text-rose-500">*</span></label>
-                    <textarea id="field-parcel" oninput="checkFormCompletion()" placeholder="Viabilidade técnica e econômica do parcelamento..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">7. Descrição da Solução Final</label>
-                    <textarea placeholder="Detalhamento da solução escolhida..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
-                </div>
-            </div>
-
-            <!-- TAB 3: ESTRATÉGIA (Micro Fase 3) -->
-            <div id="mission-tab-3" class="tab-content hidden space-y-4">
-                <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">9. Resultados Pretendidos</label>
-                    <textarea placeholder="Economicidade e melhor aproveitamento..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">10. Providências Prévias</label>
-                    <textarea placeholder="Ações necessárias antes da celebração..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">11. Contratações Correlatas</label>
-                    <textarea placeholder="Contratações interdependentes detectadas..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
-                </div>
-            </div>
-
-            <!-- TAB 4: VIABILIDADE (Micro Fase 4) -->
-            <div id="mission-tab-4" class="tab-content hidden space-y-4">
-                <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">12. Impactos Ambientais</label>
-                    <textarea placeholder="Possíveis impactos e medidas mitigadoras..." 
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Requisitos da Contratação <span class="text-rose-500">*</span></label>
+                    <textarea id="field-req" oninput="checkFormCompletion()" placeholder="O que é essencial para a solução?" 
                         class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
+            </div>
+
+            <!-- TAB 3: QUANTITATIVOS -->
+            <div id="mission-tab-3" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">13. Viabilidade da Contratação <span class="text-rose-500">*</span></label>
-                    <textarea id="field-viab" oninput="checkFormCompletion()" placeholder="Posicionamento conclusivo e razoabilidade..." 
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Estimativa de Quantidades <span class="text-rose-500">*</span></label>
+                    <textarea id="field-quant" oninput="checkFormCompletion()" placeholder="Memória de cálculo e quantidades estimadas..." 
                         class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
@@ -668,14 +588,13 @@
 
         function checkFormCompletion() {
             const desc = document.getElementById('field-desc').value.trim();
-            const parcel = document.getElementById('field-parcel').value.trim();
-            const viab = document.getElementById('field-viab').value.trim();
+            const req = document.getElementById('field-req').value.trim();
+            const quant = document.getElementById('field-quant').value.trim();
             
             const btn = document.getElementById('finish-mission-btn');
             const badge = document.getElementById('mission-badge');
             
-            // Requisito: Pelo menos 5 caracteres em cada campo obrigatório
-            const isComplete = desc.length > 5 && parcel.length > 5 && viab.length > 5;
+            const isComplete = desc.length > 5 && req.length > 5 && quant.length > 5;
 
             if (isComplete) {
                 btn.classList.replace('text-slate-200', 'text-emerald-500');
