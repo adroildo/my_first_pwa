@@ -464,12 +464,42 @@
             </div>
         </div>
 
+        <!-- BARRA DE FERRAMENTAS CONTEXTUAL (TOOLBOX) -->
+        <div class="px-6 py-3 bg-slate-100/50 dark:bg-white/5 border-t border-slate-100 dark:border-white/5">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Ferramentas de Apoio</p>
+            <div class="flex space-x-3 overflow-x-auto no-scrollbar pb-1">
+                <!-- Legislação (Sempre visível) -->
+                <a href="https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm" target="_blank" 
+                    class="flex items-center space-x-2 px-4 py-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap active:scale-95 transition-transform">
+                    <i class="fa-solid fa-gavel text-amber-500 text-xs"></i>
+                    <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Lei 14.133</span>
+                </a>
+
+                <!-- Pesquisa de Preços (Contextual) -->
+                <a href="https://www.gov.br/pncp/pt-br" target="_blank" 
+                    class="flex items-center space-x-2 px-4 py-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap active:scale-95 transition-transform">
+                    <i class="fa-solid fa-magnifying-glass-chart text-blue-500 text-xs"></i>
+                    <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">PNCP (Preços)</span>
+                </a>
+
+                <!-- Calculadora (Utilitário) -->
+                <button class="flex items-center space-x-2 px-4 py-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap active:scale-95 transition-transform">
+                    <i class="fa-solid fa-calculator text-emerald-500 text-xs"></i>
+                    <span class="text-[10px] font-bold text-slate-600 dark:text-slate-300">Calculadora</span>
+                </button>
+            </div>
+        </div>
+
         <!-- Rodapé do Formulário -->
-        <footer class="p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-white/5">
+        <footer class="p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-white/5 flex gap-3">
+            <button onclick="saveProgress()" 
+                class="flex-1 py-5 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 rounded-2xl font-black uppercase tracking-widest active:scale-95 transition-all">
+                Salvar
+            </button>
             <button onclick="finishMission()" 
-                class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-100 active:scale-95 transition-all flex items-center justify-center space-x-3">
+                class="flex-[2] py-5 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-100 active:scale-95 transition-all flex items-center justify-center space-x-3">
                 <i class="fa-solid fa-check-double"></i>
-                <span>Finalizar Missão</span>
+                <span>Concluir</span>
             </button>
         </footer>
     </div>
@@ -566,6 +596,22 @@
             activeBtn.classList.remove('text-slate-400', 'border-transparent');
         }
 
+        function saveProgress() {
+            const btn = event.currentTarget;
+            const originalText = btn.innerText;
+            btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up animate-pulse"></i>';
+            
+            // Simula salvamento no banco/localStorage
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-check text-emerald-500"></i>';
+                if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                }, 1500);
+            }, 1000);
+        }
+
         function finishMission() {
             const btn = event.currentTarget;
             btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i>';
@@ -573,7 +619,7 @@
             setTimeout(() => {
                 closeMissionForm();
                 showMissionSuccess();
-                btn.innerHTML = '<i class="fa-solid fa-check-double"></i><span>Finalizar Missão</span>';
+                btn.innerHTML = '<i class="fa-solid fa-check-double"></i><span>Concluir</span>';
             }, 800);
         }
 
