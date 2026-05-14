@@ -401,6 +401,79 @@
         </button>
     </nav>
 
+    <!-- MODAL DE FORMULÁRIO DA MISSÃO (TABS ELEGANTES) -->
+    <div id="missionFormModal" class="fixed inset-0 z-[110] bg-slate-50 dark:bg-slate-950 hidden flex flex-col animate-fade-in">
+        <!-- Header do Formulário -->
+        <header class="h-[70px] bg-white dark:bg-slate-900 shadow-sm flex items-center px-6 justify-between flex-shrink-0">
+            <button onclick="closeMissionForm()" class="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-400 flex items-center justify-center active:scale-90 transition-transform">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center">
+                <h2 class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-widest">Missão: ETP</h2>
+                <p class="text-[9px] font-bold text-blue-600 uppercase">Estudo Técnico Preliminar</p>
+            </div>
+            <div class="w-12"></div>
+        </header>
+
+        <!-- Navegação por Abas -->
+        <div class="flex px-6 pt-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-white/5 overflow-x-auto no-scrollbar">
+            <button onclick="switchTab(1)" id="tab-1-btn" class="mission-tab active pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap">1. Necessidade</button>
+            <button onclick="switchTab(2)" id="tab-2-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap">2. Requisitos</button>
+            <button onclick="switchTab(3)" id="tab-3-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap">3. Estimativa</button>
+        </div>
+
+        <!-- Conteúdo das Abas -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- TAB 1: NECESSIDADE -->
+            <div id="mission-tab-1" class="tab-content space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Descrição da Necessidade</label>
+                    <textarea placeholder="Descreva o problema a ser resolvido..." 
+                        class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium text-slate-700 dark:text-slate-200 focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Justificativa</label>
+                    <textarea placeholder="Por que esta contratação é necessária?" 
+                        class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium text-slate-700 dark:text-slate-200 focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
+                </div>
+            </div>
+
+            <!-- TAB 2: REQUISITOS -->
+            <div id="mission-tab-2" class="tab-content hidden space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Requisitos da Contratação</label>
+                    <textarea placeholder="Ex: Prazo de entrega, garantia, certificações..." 
+                        class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium text-slate-700 dark:text-slate-200 focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                </div>
+            </div>
+
+            <!-- TAB 3: ESTIMATIVA -->
+            <div id="mission-tab-3" class="tab-content hidden space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Quantidade</label>
+                        <input type="number" placeholder="0" 
+                            class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Valor Unit.</label>
+                        <input type="text" placeholder="R$ 0,00" 
+                            class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rodapé do Formulário -->
+        <footer class="p-6 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-white/5">
+            <button onclick="finishMission()" 
+                class="w-full py-5 bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-blue-100 active:scale-95 transition-all flex items-center justify-center space-x-3">
+                <i class="fa-solid fa-check-double"></i>
+                <span>Finalizar Missão</span>
+            </button>
+        </footer>
+    </div>
+
     <!-- MODAL DE SUCESSO (ESTILO DUOLINGO) -->
     <div id="successModal" class="fixed inset-0 z-[100] bg-white hidden flex flex-col items-center justify-center px-10 text-center animate-fade-in">
         <div class="mb-8 relative">
@@ -469,16 +542,39 @@
         }
 
         function playMission() {
-            // Simula o clique no botão "Jogar"
+            // Abre o formulário da missão em vez do sucesso direto
+            document.getElementById('missionFormModal').classList.remove('hidden');
+        }
+
+        function closeMissionForm() {
+            document.getElementById('missionFormModal').classList.add('hidden');
+        }
+
+        function switchTab(tabNumber) {
+            // Esconde todos os conteúdos
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+            // Remove active de todos os botões
+            document.querySelectorAll('.mission-tab').forEach(btn => {
+                btn.classList.remove('text-blue-600', 'border-blue-600');
+                btn.classList.add('text-slate-400', 'border-transparent');
+            });
+
+            // Mostra o atual
+            document.getElementById(`mission-tab-${tabNumber}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tabNumber}-btn`);
+            activeBtn.classList.add('text-blue-600', 'border-blue-600');
+            activeBtn.classList.remove('text-slate-400', 'border-transparent');
+        }
+
+        function finishMission() {
             const btn = event.currentTarget;
             btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i>';
-            btn.disabled = true;
-
+            
             setTimeout(() => {
+                closeMissionForm();
                 showMissionSuccess();
-                btn.innerHTML = 'Jogar';
-                btn.disabled = false;
-            }, 1000);
+                btn.innerHTML = '<i class="fa-solid fa-check-double"></i><span>Finalizar Missão</span>';
+            }, 800);
         }
 
         function showMissionSuccess() {
@@ -492,25 +588,18 @@
             (function frame() {
                 confetti({
                     particleCount: 3,
-                    angle: 60,
-                    spread: 55,
-                    origin: { x: 0 },
+                    angle: 60, spread: 55, origin: { x: 0 },
                     colors: ['#2563eb', '#10b981', '#fbbf24']
                 });
                 confetti({
                     particleCount: 3,
-                    angle: 120,
-                    spread: 55,
-                    origin: { x: 1 },
+                    angle: 120, spread: 55, origin: { x: 1 },
                     colors: ['#2563eb', '#10b981', '#fbbf24']
                 });
 
-                if (Date.now() < end) {
-                    requestAnimationFrame(frame);
-                }
+                if (Date.now() < end) requestAnimationFrame(frame);
             }());
 
-            // Atualiza XP logicamente
             updateXP(150);
         }
 
