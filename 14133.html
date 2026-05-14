@@ -280,33 +280,7 @@
                 <div class="trail-line"></div>
                 <div id="trailProgress" class="trail-line-progress" style="height: 0%;"></div>
 
-                <!-- Fase 1: DFD -->
-                <div class="relative flex items-start">
-                    <div class="progress-circle shadow-sm shrink-0" style="--percent: 100%; --progress-color: #10b981;">
-                        <div
-                            class="w-9 h-9 rounded-full bg-emerald-500 text-white flex items-center justify-center z-10">
-                            <i class="fa-solid fa-check text-xs"></i>
-                        </div>
-                    </div>
-                    <div class="ml-6 w-full">
-                        <div class="mb-3">
-                            <h4 class="font-bold text-sm">Fase 1: DFD</h4>
-                            <span
-                                class="text-[9px] font-black text-emerald-600 uppercase tracking-wider">Concluído</span>
-                        </div>
 
-                        <div class="mission-card completed">
-                            <div class="flex justify-between items-start mb-3">
-                                <span class="text-[10px] font-bold text-slate-500">MISSÃO: LEVANTAMENTO</span>
-                                <i class="fa-solid fa-circle-check text-emerald-500"></i>
-                            </div>
-                            <div class="flex gap-4 text-[9px] font-bold text-slate-400 uppercase">
-                                <div><i class="fa-regular fa-calendar mr-1"></i> 12/04</div>
-                                <div><i class="fa-regular fa-clock mr-1"></i> 2 Dias</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Fase 2: ETP (Dinâmico) -->
                 <div id="etp-timeline-phase" class="space-y-4">
@@ -722,7 +696,6 @@
             const container = document.getElementById('etp-timeline-phase');
             let html = '';
             
-            // Agrupa por fase
             const phases = {};
             missionStatus.forEach(m => {
                 if (!phases[m.phase]) phases[m.phase] = { desc: m.phaseDesc, missions: [] };
@@ -733,12 +706,20 @@
                 const phase = phases[phaseTitle];
                 const isLocked = phase.missions.every(m => m.status === 'locked');
                 const progress = calculatePhaseProgress(phase.missions);
+                
+                // Define cor base da fase
+                const isPhase1 = phaseTitle.includes('Fase 1');
+                const phaseColor = isPhase1 ? '#10b981' : '#2563eb';
+                const bgClass = isPhase1 ? 'bg-emerald-500' : 'bg-blue-600';
+                const textClass = isPhase1 ? 'text-emerald-600' : 'text-blue-600';
+                const badgeClass = isPhase1 ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600';
+                const btnClass = isPhase1 ? 'bg-emerald-600 shadow-[0_8px_25px_-5px_rgba(16,185,129,0.4)]' : 'bg-blue-600 shadow-[0_8px_25px_-5px_rgba(37,99,235,0.4)]';
 
                 html += `
                     <div class="relative flex items-start ${isLocked ? 'opacity-40 grayscale' : ''}">
-                        <div class="progress-circle shadow-md shrink-0" style="--percent: ${progress}%; --progress-color: #2563eb;">
-                            <div class="w-9 h-9 rounded-full ${progress === 100 ? 'bg-emerald-500' : 'bg-blue-600'} text-white flex items-center justify-center z-10">
-                                <i class="fa-solid ${progress === 100 ? 'fa-check' : 'fa-pen-nib'} text-xs"></i>
+                        <div class="progress-circle shadow-md shrink-0" style="--percent: ${progress}%; --progress-color: ${phaseColor};">
+                            <div class="w-9 h-9 rounded-full ${progress === 100 ? 'bg-emerald-500' : bgClass} text-white flex items-center justify-center z-10 transition-colors duration-500">
+                                <i class="fa-solid ${progress === 100 ? 'fa-check' : (isPhase1 ? 'fa-file-contract' : 'fa-pen-nib')} text-xs"></i>
                             </div>
                         </div>
                         <div class="ml-6 w-full space-y-4 pb-10">
@@ -768,14 +749,14 @@
                             <div class="mission-card active">
                                 <div class="flex justify-between items-center mb-3">
                                     <div class="flex items-center">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-600 mr-2 status-pulse"></span>
-                                        <span class="text-[9px] font-black text-blue-900 uppercase tracking-widest">${m.title}</span>
+                                        <span class="w-1.5 h-1.5 rounded-full ${bgClass} mr-2 status-pulse"></span>
+                                        <span class="text-[9px] font-black ${isPhase1 ? 'text-emerald-900' : 'text-blue-900'} uppercase tracking-widest">${m.title}</span>
                                     </div>
-                                    <span class="text-[8px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase">Em Jogo</span>
+                                    <span class="text-[8px] font-black ${badgeClass} px-2 py-0.5 rounded-full uppercase">Em Jogo</span>
                                 </div>
                                 <h5 class="text-[10px] font-bold text-slate-800 mb-3">${m.desc}</h5>
                                 <button onclick="playMission(${m.id})"
-                                    class="w-full py-2.5 bg-blue-600 text-white text-[9px] font-black rounded-xl shadow-lg tap-feedback uppercase tracking-widest">
+                                    class="w-full py-2.5 ${btnClass} text-white text-[9px] font-black rounded-xl tap-feedback uppercase tracking-widest">
                                     Iniciar Missão
                                 </button>
                             </div>
