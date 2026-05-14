@@ -284,11 +284,6 @@
                 <div id="etp-timeline-phase" class="space-y-4">
                     <!-- Cards de missão injetados via JS -->
                 </div>
-
-                <!-- Fases dinâmicas injetadas via JS -->
-                <div id="etp-timeline-phase" class="space-y-4">
-                    <!-- Cards de missão injetados via JS -->
-                </div>
             </div>
         </div>
     </main>
@@ -646,9 +641,8 @@
             const lobby = document.getElementById('lobbyView');
             const match = document.getElementById('matchView');
             const matchTitle = document.getElementById('currentMatchTitle');
-            const trail = document.getElementById('trailProgress');
 
-            if (!lobby || !match || !matchTitle || !trail) return;
+            if (!lobby || !match || !matchTitle) return;
 
             matchTitle.innerText = title;
 
