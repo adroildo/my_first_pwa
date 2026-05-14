@@ -215,7 +215,7 @@
 
             <div class="space-y-4">
                 <!-- Card Campanha 1 -->
-                <div onclick="openMatch('Ar-Condicionado #04', 35)"
+                <div onclick="openMatch('Ar-Condicionado #04')"
                     class="bg-white p-5 rounded-[32px] shadow-sm border border-slate-100 tap-feedback group">
                     <div class="flex justify-between items-start mb-4">
                         <div
@@ -246,7 +246,7 @@
                 </div>
 
                 <!-- Card Campanha 2 -->
-                <div onclick="openMatch('Mobiliário Escolar', 72)"
+                <div onclick="openMatch('Mobiliário Escolar')"
                     class="bg-white p-5 rounded-[32px] shadow-sm border border-slate-100 tap-feedback opacity-90">
                     <div class="flex justify-between items-start mb-4">
                         <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400">
@@ -653,7 +653,7 @@
     <script>
         let userXP = 4850;
 
-        function openMatch(title, progress) {
+        function openMatch(title) {
             const lobby = document.getElementById('lobbyView');
             const match = document.getElementById('matchView');
             const matchTitle = document.getElementById('currentMatchTitle');
@@ -666,9 +666,8 @@
             lobby.classList.replace('active-content', 'hidden-content');
             setTimeout(() => {
                 match.classList.replace('hidden-content', 'active-content');
-                setTimeout(() => {
-                    trail.style.height = progress + '%';
-                }, 300);
+                // Deixa o renderTimeline cuidar do progresso real
+                renderTimeline();
             }, 150);
         }
 
@@ -795,13 +794,15 @@
             const progressLine = document.getElementById('trailProgress');
             progressLine.style.height = `${totalProgress}%`;
 
-            // Lógica de Cores da Linha (Gradiente por Fase)
-            // DFD é a primeira metade (4 de 8 missões = 50%)
+            // Ajuste Dinâmico da Cor da Linha
+            // Se o progresso passou de 50% (entrou no ETP), calculamos onde a cor deve mudar
+            // para que o Verde pare exatamente na marca de 50% do container total.
             if (totalProgress <= 50) {
-                progressLine.style.background = '#10b981'; // Todo verde no DFD
+                progressLine.style.background = '#10b981';
             } else {
-                // Gradiente: 50% verde (DFD) e o resto azul (ETP)
-                progressLine.style.background = 'linear-gradient(to bottom, #10b981 50%, #2563eb 50%)';
+                // Cálculo: (Ponto de Transição / Progresso Atual) * 100
+                const colorStop = (50 / totalProgress) * 100;
+                progressLine.style.background = `linear-gradient(to bottom, #10b981 ${colorStop}%, #2563eb ${colorStop}%)`;
             }
         }
 
@@ -1050,7 +1051,7 @@
         }
 
         function createNewMission() {
-            openMatch('Nova Contratação #2024', 5);
+            openMatch('Nova Contratação #2024');
         }
 
         window.onload = () => {
