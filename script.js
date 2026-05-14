@@ -1086,3 +1086,12 @@ function useHint() {
 
     showAlert('Dica usada! -50 moedas', 'fa-lightbulb');
 }
+
+// Lógica de Automação de Documentos
+function openDocForm(docType) {
+    showAlert(`Iniciando ${docType.toUpperCase()}...`, "fa-file-signature");
+    closeQuickMenu();
+    
+    // Futura implementação do formulário de metadados
+    console.log(`Abrindo formulário para: ${docType}`);
+}

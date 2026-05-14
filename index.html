@@ -458,82 +458,41 @@
 
             <!-- PÁGINA 1 -->
             <div id="quick-page-1" class="grid grid-cols-3 gap-4 transition-all duration-300">
-                <button onclick="openPostModal()" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                <button onclick="openDocForm('memorando')" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Memorando</span>
+                </button>
+                <button onclick="openDocForm('oficio')" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
                     <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-pen-to-square"></i>
+                        <i class="fa-solid fa-stamp"></i>
                     </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Novo Post</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Ofício</span>
                 </button>
-                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                <button onclick="openDocForm('requisicao')" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
                     <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-list-check"></i>
+                        <i class="fa-solid fa-file-contract"></i>
                     </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Tarefa</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Requisição</span>
                 </button>
-                <button onclick="openCamera()" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
+                <button onclick="openDocForm('relatorio')" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
                     <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-camera"></i>
+                        <i class="fa-solid fa-chart-line"></i>
                     </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Câmera</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Relatório</span>
                 </button>
                 <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
-                    <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                    </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Finanças</span>
-                </button>
-                <button onclick="handleCheckIn()" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
-                    <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-location-dot"></i>
-                    </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Check-in</span>
-                </button>
-                <button onclick="toggleMoreOptions(true)" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
                     <div class="w-14 h-14 bg-slate-50 text-slate-600 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-ellipsis"></i>
+                        <i class="fa-solid fa-folder-open"></i>
                     </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Mais</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Arquivos</span>
                 </button>
             </div>
 
             <!-- PÁGINA 2 (Escondida) -->
             <div id="quick-page-2" class="hidden grid grid-cols-3 gap-4 transition-all duration-300">
-                <button onclick="openMapModal()" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
-                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-map-location-dot"></i>
-                    </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Ver Mapa</span>
-                </button>
-                <button onclick="openQuiz()" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
-                    <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-gamepad"></i>
-                    </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Quiz Game</span>
-                </button>
-                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
-                    <div class="w-14 h-14 bg-cyan-50 text-cyan-600 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                    </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Arquivos</span>
-                </button>
-                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
-                    <div class="w-14 h-14 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-user-group"></i>
-                    </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Contatos</span>
-                </button>
-                <button class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
-                    <div class="w-14 h-14 bg-pink-50 text-pink-600 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-heart"></i>
-                    </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Favoritos</span>
-                </button>
-                <button onclick="toggleMoreOptions(false)" class="flex flex-col items-center space-y-2 active:scale-90 transition-transform">
-                    <div class="w-14 h-14 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </div>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Voltar</span>
-                </button>
+                <!-- Opções secundárias entrarão aqui -->
             </div>
 
             <button onclick="closeQuickMenu()"
