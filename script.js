@@ -1087,6 +1087,23 @@ function useHint() {
     showAlert('Dica usada! -50 moedas', 'fa-lightbulb');
 }
 
+// Dados Predefinidos para Automação
+const organsData = {
+    "Saúde": ["Gabinete do Secretário", "Vigilância Sanitária", "Fundo Municipal de Saúde", "Hospital Municipal"],
+    "Educação": ["Departamento Pedagógico", "Recursos Humanos", "Transporte Escolar", "Alimentação Escolar"],
+    "Gabinete": ["Assessoria Jurídica", "Comunicação Social", "Protocolo Geral", "Relações Institucionais"]
+};
+
+const signatoriesData = [
+    "Dr. Roberto Alencar (Secretário)",
+    "Dra. Sandra Lima (Diretora Técnica)",
+    "Carlos Mendonça (Chefe de Gabinete)",
+    "Juliana Ferreira (Coordenadora Administrativa)",
+    "Marcos Paulo (Assessor Especial)"
+];
+
+let selectedSignatories = [];
+
 // Lógica de Automação de Documentos (Full Screen Wizard)
 let currentWizardStep = 1;
 const totalWizardSteps = 3;
@@ -1094,7 +1111,6 @@ const totalWizardSteps = 3;
 function openDocForm(docType) {
     closeQuickMenu();
     
-    // Configura o título do documento
     const titleMap = {
         'memorando': 'Memorando',
         'oficio': 'Ofício',
@@ -1104,11 +1120,79 @@ function openDocForm(docType) {
     
     document.getElementById('wizard-title').innerText = titleMap[docType] || 'Novo Documento';
     
-    // Limpa campos e reseta Wizard
     resetWizard();
     
-    // Mostra a seção
+    // Auto-incremento do número
+    const nextNum = getNextDocNumber(titleMap[docType] || 'Documento');
+    document.getElementById('w-doc-number').value = nextNum;
+
+    // Inicializa Signatários
+    initSignatories();
+
     document.getElementById('doc-section').classList.remove('hidden');
+}
+
+function getNextDocNumber(type) {
+    const docs = JSON.parse(localStorage.getItem('saved_docs') || '[]');
+    const currentYear = new Date().getFullYear();
+    
+    // Filtra docs do mesmo tipo e ano
+    const sameTypeDocs = docs.filter(d => d.tipo === type && d.numero && d.numero.includes(`/${currentYear}`));
+    
+    if (sameTypeDocs.length === 0) return `001/${currentYear}`;
+    
+    // Pega o maior número
+    const lastNum = sameTypeDocs.reduce((max, d) => {
+        const numPart = parseInt(d.numero.split('/')[0]);
+        return numPart > max ? numPart : max;
+    }, 0);
+    
+    return `${String(lastNum + 1).padStart(3, '0')}/${currentYear}`;
+}
+
+function updateSectors() {
+    const organSelect = document.getElementById('w-doc-organ');
+    const sectorSelect = document.getElementById('w-doc-sector');
+    const selectedOrgan = organSelect.value;
+    
+    sectorSelect.innerHTML = '<option value="">Selecione o Setor...</option>';
+    
+    if (selectedOrgan && organsData[selectedOrgan]) {
+        organsData[selectedOrgan].forEach(sector => {
+            const opt = document.createElement('option');
+            opt.value = sector;
+            opt.innerText = sector;
+            sectorSelect.appendChild(opt);
+        });
+    }
+}
+
+function initSignatories() {
+    const list = document.getElementById('w-signer-list');
+    list.innerHTML = '';
+    selectedSignatories = [];
+    
+    signatoriesData.forEach(name => {
+        const chip = document.createElement('div');
+        chip.className = 'px-4 py-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 text-xs font-bold text-slate-500 dark:text-slate-400 cursor-pointer transition-all active:scale-95';
+        chip.innerText = name;
+        chip.onclick = () => toggleSignatory(chip, name);
+        list.appendChild(chip);
+    });
+}
+
+function toggleSignatory(el, name) {
+    if (selectedSignatories.includes(name)) {
+        selectedSignatories = selectedSignatories.filter(s => s !== name);
+        el.classList.replace('bg-indigo-600', 'bg-slate-50');
+        el.classList.replace('text-white', 'text-slate-500');
+        el.classList.remove('border-indigo-600');
+    } else {
+        selectedSignatories.push(name);
+        el.classList.replace('bg-slate-50', 'bg-indigo-600');
+        el.classList.replace('text-slate-500', 'text-white');
+        el.classList.add('border-indigo-600');
+    }
 }
 
 function closeDocSection() {
@@ -1117,32 +1201,31 @@ function closeDocSection() {
 
 function resetWizard() {
     currentWizardStep = 1;
-    document.getElementById('w-doc-number').value = '';
     document.getElementById('w-doc-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('w-doc-organ').value = '';
+    updateSectors();
     document.getElementById('w-doc-title').value = '';
-    document.getElementById('w-doc-origin').value = '';
     document.getElementById('w-doc-destination').value = '';
-    document.getElementById('w-doc-signer').value = localStorage.getItem('user_name') || '';
-    
     updateWizardUI();
 }
 
 function changeStep(delta) {
     const nextStep = currentWizardStep + delta;
     
-    // Validação básica ao avançar
     if (delta > 0) {
         if (currentWizardStep === 1) {
-            const num = document.getElementById('w-doc-number').value;
-            if (!num) return showAlert("Informe o número do documento!");
+            if (!document.getElementById('w-doc-organ').value || !document.getElementById('w-doc-sector').value) {
+                return showAlert("Selecione o Órgão e o Setor!");
+            }
+            if (selectedSignatories.length === 0) {
+                return showAlert("Selecione ao menos um signatário!");
+            }
         }
         if (currentWizardStep === 2) {
-            const title = document.getElementById('w-doc-title').value;
-            if (!title) return showAlert("Informe o assunto!");
+            if (!document.getElementById('w-doc-title').value) return showAlert("Informe o assunto!");
         }
     }
 
-    // Se estiver no último passo e clicar em avançar, gera o JSON
     if (nextStep > totalWizardSteps) {
         generateWizardJson();
         return;
@@ -1150,23 +1233,33 @@ function changeStep(delta) {
 
     if (nextStep >= 1 && nextStep <= totalWizardSteps) {
         currentWizardStep = nextStep;
+        if (currentWizardStep === 3) updateReviewUI();
         updateWizardUI();
     }
 }
 
+function updateReviewUI() {
+    document.getElementById('review-type').innerText = document.getElementById('wizard-title').innerText;
+    document.getElementById('review-number').innerText = document.getElementById('w-doc-number').value;
+    document.getElementById('review-origin').innerText = `${document.getElementById('w-doc-organ').value} / ${document.getElementById('w-doc-sector').value}`;
+    
+    const signersDiv = document.getElementById('review-signers');
+    signersDiv.innerHTML = '';
+    selectedSignatories.forEach(s => {
+        const chip = document.createElement('span');
+        chip.className = 'px-2 py-1 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-lg text-[9px] font-black border border-indigo-100 dark:border-indigo-500/20';
+        chip.innerText = s;
+        signersDiv.appendChild(chip);
+    });
+}
+
 function updateWizardUI() {
-    // Esconde todos os passos
     document.querySelectorAll('.wizard-step').forEach(step => step.classList.add('hidden'));
-    
-    // Mostra o passo atual
     document.getElementById(`step-${currentWizardStep}`).classList.remove('hidden');
-    
-    // Atualiza indicadores
     document.getElementById('wizard-step-indicator').innerText = `Passo ${currentWizardStep} de ${totalWizardSteps}`;
     const progress = (currentWizardStep / totalWizardSteps) * 100;
     document.getElementById('wizard-progress').style.width = `${progress}%`;
     
-    // Controles
     const prevBtn = document.getElementById('prev-step');
     const nextBtn = document.getElementById('next-step');
     const nextBtnSpan = nextBtn.querySelector('span');
@@ -1178,7 +1271,7 @@ function updateWizardUI() {
     }
 
     if (currentWizardStep === totalWizardSteps) {
-        nextBtnSpan.innerText = 'Finalizar e Gerar';
+        nextBtnSpan.innerText = 'Gerar JSON Final';
         nextBtn.classList.replace('bg-indigo-600', 'bg-emerald-600');
     } else {
         nextBtnSpan.innerText = 'Avançar';
@@ -1191,22 +1284,19 @@ function generateWizardJson() {
         tipo: document.getElementById('wizard-title').innerText,
         numero: document.getElementById('w-doc-number').value,
         data_emissao: document.getElementById('w-doc-date').value,
+        orgao_origem: document.getElementById('w-doc-organ').value,
+        setor_origem: document.getElementById('w-doc-sector').value,
+        signatarios: selectedSignatories,
         assunto: document.getElementById('w-doc-title').value,
-        origem: document.getElementById('w-doc-origin').value,
         destino: document.getElementById('w-doc-destination').value,
-        assinante: document.getElementById('w-doc-signer').value,
         data_geracao: new Date().toISOString()
     };
 
-    console.log("JSON Gerado via Wizard:", data);
-    
-    // Salvamento Local
     const docs = JSON.parse(localStorage.getItem('saved_docs') || '[]');
     docs.unshift(data);
     localStorage.setItem('saved_docs', JSON.stringify(docs));
 
-    // Feedback e Download
-    showAlert("Documento gerado com sucesso!", "fa-check-double");
+    showAlert("Documento gerado!", "fa-check-double");
     
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
     const dlAnchor = document.createElement('a');

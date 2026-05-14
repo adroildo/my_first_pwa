@@ -358,32 +358,64 @@
             <!-- Conteúdo das Etapas -->
             <div class="flex-1 overflow-y-auto p-6">
                 
-                <!-- PASSO 1: Identificação -->
+                <!-- PASSO 1: Identificação & Origem -->
                 <div id="step-1" class="wizard-step space-y-6">
                     <div class="pt-2">
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white">Identificação</h3>
-                        <p class="text-slate-400 text-sm font-medium">Defina os dados básicos do documento.</p>
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white">Dados Básicos</h3>
+                        <p class="text-slate-400 text-sm font-medium">Inicie a identificação do documento.</p>
                     </div>
                     
                     <div class="space-y-4">
-                        <div>
-                            <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Número do Documento</label>
-                            <input type="text" id="w-doc-number" placeholder="Ex: 001/2024"
-                                class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
+                        <!-- Linha: Número e Data -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Número</label>
+                                <input type="text" id="w-doc-number" placeholder="Calculando..." readonly
+                                    class="w-full bg-slate-100 dark:bg-white/5 border-2 border-transparent rounded-2xl p-4 text-sm font-bold text-slate-500 dark:text-slate-400 outline-none">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Data</label>
+                                <input type="date" id="w-doc-date"
+                                    class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
+                            </div>
                         </div>
+
+                        <!-- Selects Dependentes: Órgão e Setor -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Órgão de Origem</label>
+                                <select id="w-doc-organ" onchange="updateSectors()"
+                                    class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none appearance-none transition-all">
+                                    <option value="">Selecione...</option>
+                                    <option value="Saúde">Secretaria de Saúde</option>
+                                    <option value="Educação">Secretaria de Educação</option>
+                                    <option value="Gabinete">Gabinete do Prefeito</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Setor de Origem</label>
+                                <select id="w-doc-sector"
+                                    class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none appearance-none transition-all">
+                                    <option value="">Aguardando Órgão...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Seleção de Signatários (Chips) -->
                         <div>
-                            <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Data de Emissão</label>
-                            <input type="date" id="w-doc-date"
-                                class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
+                            <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Signatários (Selecione um ou mais)</label>
+                            <div id="w-signer-list" class="flex flex-wrap gap-2 pt-2">
+                                <!-- Chips inseridos via JS -->
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- PASSO 2: Endereçamento -->
+                <!-- PASSO 2: Assunto & Destino -->
                 <div id="step-2" class="wizard-step hidden space-y-6">
                     <div class="pt-2">
                         <h3 class="text-xl font-black text-slate-800 dark:text-white">Endereçamento</h3>
-                        <p class="text-slate-400 text-sm font-medium">Para quem e de onde vem o documento?</p>
+                        <p class="text-slate-400 text-sm font-medium">Defina o objetivo e o destino.</p>
                     </div>
 
                     <div class="space-y-4">
@@ -392,38 +424,38 @@
                             <input type="text" id="w-doc-title" placeholder="Assunto do documento"
                                 class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
                         </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Origem</label>
-                                <input type="text" id="w-doc-origin" placeholder="Setor A"
-                                    class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Destino</label>
-                                <input type="text" id="w-doc-destination" placeholder="Setor B"
-                                    class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
-                            </div>
+                        <div>
+                            <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Destino Final</label>
+                            <input type="text" id="w-doc-destination" placeholder="Setor ou Pessoa de destino"
+                                class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
                         </div>
                     </div>
                 </div>
 
-                <!-- PASSO 3: Assinatura -->
+                <!-- PASSO 3: Revisão -->
                 <div id="step-3" class="wizard-step hidden space-y-6">
                     <div class="pt-2">
-                        <h3 class="text-xl font-black text-slate-800 dark:text-white">Assinatura</h3>
-                        <p class="text-slate-400 text-sm font-medium">Quem será o responsável legal?</p>
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white">Revisão Final</h3>
+                        <p class="text-slate-400 text-sm font-medium">Confirme os dados antes de gerar o JSON.</p>
                     </div>
 
-                    <div class="space-y-4">
-                        <div>
-                            <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Quem Assina</label>
-                            <input type="text" id="w-doc-signer" placeholder="Nome do Assinante"
-                                class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
+                    <div class="p-6 bg-slate-50 dark:bg-white/5 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-white/10 space-y-3">
+                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            <span>Tipo:</span>
+                            <span id="review-type" class="text-indigo-500">Memorando</span>
                         </div>
-                        <div class="p-6 bg-indigo-50 dark:bg-indigo-500/10 rounded-[2rem] border-2 border-dashed border-indigo-200 dark:border-indigo-500/20 text-center">
-                            <i class="fa-solid fa-cloud-arrow-up text-indigo-500 text-2xl mb-2"></i>
-                            <p class="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase">Resumo Gerado Automaticamente</p>
-                            <p class="text-xs text-indigo-400 dark:text-indigo-300 mt-1">O JSON será formatado para integração direta com o Google Docs.</p>
+                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            <span>Número:</span>
+                            <span id="review-number" class="text-slate-700 dark:text-white">-</span>
+                        </div>
+                        <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            <span>Origem:</span>
+                            <span id="review-origin" class="text-slate-700 dark:text-white">-</span>
+                        </div>
+                        <div class="w-full h-px bg-slate-200 dark:bg-white/5 my-2"></div>
+                        <p class="text-[10px] font-black uppercase text-slate-400">Signatários:</p>
+                        <div id="review-signers" class="flex flex-wrap gap-1">
+                            <!-- Listagem de selecionados -->
                         </div>
                     </div>
                 </div>
