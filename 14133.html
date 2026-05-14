@@ -66,7 +66,7 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background: #e2e8f0;
+            background: linear-gradient(to bottom, #d1fae5 50%, #dbeafe 50%);
             z-index: 0;
             border-radius: 2px;
         }
@@ -788,8 +788,21 @@
 
             container.innerHTML = html;
             
-            const totalProgress = (missionStatus.filter(m => m.status === 'completed').length / missionStatus.length) * 100;
-            document.getElementById('trailProgress').style.height = `${totalProgress}%`;
+            const completedCount = missionStatus.filter(m => m.status === 'completed').length;
+            const totalCount = missionStatus.length;
+            const totalProgress = (completedCount / totalCount) * 100;
+            
+            const progressLine = document.getElementById('trailProgress');
+            progressLine.style.height = `${totalProgress}%`;
+
+            // Lógica de Cores da Linha (Gradiente por Fase)
+            // DFD é a primeira metade (4 de 8 missões = 50%)
+            if (totalProgress <= 50) {
+                progressLine.style.background = '#10b981'; // Todo verde no DFD
+            } else {
+                // Gradiente: 50% verde (DFD) e o resto azul (ETP)
+                progressLine.style.background = 'linear-gradient(to bottom, #10b981 50%, #2563eb 50%)';
+            }
         }
 
         function calculatePhaseProgress(missions) {
