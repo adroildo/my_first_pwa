@@ -1089,18 +1089,25 @@ function useHint() {
 
 // Dados Predefinidos para Automação
 const organsData = {
-    "Saúde": ["Gabinete do Secretário", "Vigilância Sanitária", "Fundo Municipal de Saúde", "Hospital Municipal"],
-    "Educação": ["Departamento Pedagógico", "Recursos Humanos", "Transporte Escolar", "Alimentação Escolar"],
-    "Gabinete": ["Assessoria Jurídica", "Comunicação Social", "Protocolo Geral", "Relações Institucionais"]
+    "Saúde": {
+        "Gabinete do Secretário": ["Dr. Roberto Alencar (Secretário)"],
+        "Vigilância Sanitária": ["Dra. Sandra Lima (Diretora Técnica)", "João Inspetor (Fiscal)"],
+        "Fundo Municipal de Saúde": ["Contador Responsável", "Dr. Roberto Alencar (Secretário)"],
+        "Hospital Municipal": ["Diretor Clínico", "Administrador Hospitalar"]
+    },
+    "Educação": {
+        "Departamento Pedagógico": ["Prof. Maria Eduarda (Diretora)", "Coordenação Pedagógica"],
+        "Recursos Humanos": ["Chefe de RH"],
+        "Transporte Escolar": ["Gestor de Frotas"],
+        "Alimentação Escolar": ["Nutricionista Responsável"]
+    },
+    "Gabinete": {
+        "Assessoria Jurídica": ["Dr. Marcos Vinícius (Procurador)"],
+        "Comunicação Social": ["Diretor de Comunicação"],
+        "Protocolo Geral": ["Chefe de Protocolo"],
+        "Relações Institucionais": ["Secretário de Governo"]
+    }
 };
-
-const signatoriesData = [
-    "Dr. Roberto Alencar (Secretário)",
-    "Dra. Sandra Lima (Diretora Técnica)",
-    "Carlos Mendonça (Chefe de Gabinete)",
-    "Juliana Ferreira (Coordenadora Administrativa)",
-    "Marcos Paulo (Assessor Especial)"
-];
 
 let selectedSignatories = [];
 
@@ -1126,25 +1133,19 @@ function openDocForm(docType) {
     const nextNum = getNextDocNumber(titleMap[docType] || 'Documento');
     document.getElementById('w-doc-number').value = nextNum;
 
-    // Inicializa Signatários
-    initSignatories();
-
     document.getElementById('doc-section').classList.remove('hidden');
 }
 
 function getNextDocNumber(type) {
     const docs = JSON.parse(localStorage.getItem('saved_docs') || '[]');
     const currentYear = new Date().getFullYear();
-    
-    // Filtra docs do mesmo tipo e ano
     const sameTypeDocs = docs.filter(d => d.tipo === type && d.numero && d.numero.includes(`/${currentYear}`));
     
     if (sameTypeDocs.length === 0) return `001/${currentYear}`;
     
-    // Pega o maior número
     const lastNum = sameTypeDocs.reduce((max, d) => {
         const numPart = parseInt(d.numero.split('/')[0]);
-        return numPart > max ? numPart : max;
+        return isNaN(numPart) ? max : (numPart > max ? numPart : max);
     }, 0);
     
     return `${String(lastNum + 1).padStart(3, '0')}/${currentYear}`;
@@ -1156,42 +1157,70 @@ function updateSectors() {
     const selectedOrgan = organSelect.value;
     
     sectorSelect.innerHTML = '<option value="">Selecione o Setor...</option>';
+    sectorSelect.onchange = initSignatoriesBySector; // Vincula mudança de setor aos signatários
     
     if (selectedOrgan && organsData[selectedOrgan]) {
-        organsData[selectedOrgan].forEach(sector => {
+        Object.keys(organsData[selectedOrgan]).forEach(sector => {
             const opt = document.createElement('option');
             opt.value = sector;
             opt.innerText = sector;
             sectorSelect.appendChild(opt);
         });
     }
+    
+    // Limpa signatários se mudar órgão
+    document.getElementById('w-signer-list').innerHTML = '';
+    selectedSignatories = [];
 }
 
-function initSignatories() {
+function initSignatoriesBySector() {
+    const organ = document.getElementById('w-doc-organ').value;
+    const sector = document.getElementById('w-doc-sector').value;
     const list = document.getElementById('w-signer-list');
+    
     list.innerHTML = '';
     selectedSignatories = [];
     
-    signatoriesData.forEach(name => {
-        const chip = document.createElement('div');
+    if (organ && sector && organsData[organ][sector]) {
+        organsData[organ][sector].forEach(name => {
+            createSignatoryChip(name, true); // Pré-selecionados por padrão
+        });
+    }
+}
+
+function addCustomSignatory() {
+    const input = document.getElementById('w-custom-signer');
+    const name = input.value.trim();
+    
+    if (!name) return;
+    
+    createSignatoryChip(name, true);
+    input.value = '';
+}
+
+function createSignatoryChip(name, isSelected) {
+    const list = document.getElementById('w-signer-list');
+    const chip = document.createElement('div');
+    
+    if (isSelected) {
+        selectedSignatories.push(name);
+        chip.className = 'px-4 py-2 rounded-xl bg-indigo-600 border border-indigo-600 text-xs font-bold text-white cursor-pointer transition-all active:scale-95';
+    } else {
         chip.className = 'px-4 py-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 text-xs font-bold text-slate-500 dark:text-slate-400 cursor-pointer transition-all active:scale-95';
-        chip.innerText = name;
-        chip.onclick = () => toggleSignatory(chip, name);
-        list.appendChild(chip);
-    });
+    }
+    
+    chip.innerText = name;
+    chip.onclick = () => toggleSignatory(chip, name);
+    list.appendChild(chip);
 }
 
 function toggleSignatory(el, name) {
     if (selectedSignatories.includes(name)) {
         selectedSignatories = selectedSignatories.filter(s => s !== name);
-        el.classList.replace('bg-indigo-600', 'bg-slate-50');
-        el.classList.replace('text-white', 'text-slate-500');
-        el.classList.remove('border-indigo-600');
+        el.className = 'px-4 py-2 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 text-xs font-bold text-slate-500 dark:text-slate-400 cursor-pointer transition-all active:scale-95';
     } else {
         selectedSignatories.push(name);
-        el.classList.replace('bg-slate-50', 'bg-indigo-600');
-        el.classList.replace('text-slate-500', 'text-white');
-        el.classList.add('border-indigo-600');
+        el.className = 'px-4 py-2 rounded-xl bg-indigo-600 border border-indigo-600 text-xs font-bold text-white cursor-pointer transition-all active:scale-95';
     }
 }
 

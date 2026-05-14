@@ -402,9 +402,19 @@
                         </div>
 
                         <!-- Seleção de Signatários (Chips) -->
-                        <div>
-                            <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Signatários (Selecione um ou mais)</label>
-                            <div id="w-signer-list" class="flex flex-wrap gap-2 pt-2">
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black uppercase text-slate-400 ml-2 block">Signatários do Documento</label>
+                            
+                            <!-- Input Manual -->
+                            <div class="flex space-x-2">
+                                <input type="text" id="w-custom-signer" placeholder="Adicionar nome/cargo manualmente..."
+                                    class="flex-1 bg-slate-50 dark:bg-white/5 border-2 border-slate-100 dark:border-white/10 rounded-2xl p-4 text-xs font-bold text-slate-800 dark:text-white focus:border-indigo-500 outline-none transition-all">
+                                <button onclick="addCustomSignatory()" class="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 flex items-center justify-center active:scale-90 transition-transform">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+
+                            <div id="w-signer-list" class="flex flex-wrap gap-2 pt-1">
                                 <!-- Chips inseridos via JS -->
                             </div>
                         </div>
