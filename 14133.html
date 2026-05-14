@@ -419,51 +419,99 @@
             </div>
         </header>
 
-        <!-- Navegação por Abas -->
+        <!-- Navegação por Abas (Scrollable) -->
         <div class="flex px-6 pt-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-white/5 overflow-x-auto no-scrollbar">
-            <button onclick="switchTab(1)" id="tab-1-btn" class="mission-tab active pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap">1. Necessidade</button>
-            <button onclick="switchTab(2)" id="tab-2-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap">2. Requisitos</button>
-            <button onclick="switchTab(3)" id="tab-3-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap">3. Estimativa</button>
+            <button onclick="switchTab(1)" id="tab-1-btn" class="mission-tab active pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 whitespace-nowrap">1. Identificação</button>
+            <button onclick="switchTab(2)" id="tab-2-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap">2. Solução</button>
+            <button onclick="switchTab(3)" id="tab-3-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap">3. Valores</button>
+            <button onclick="switchTab(4)" id="tab-4-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap">4. Resultados</button>
+            <button onclick="switchTab(5)" id="tab-5-btn" class="mission-tab pb-4 px-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b-2 border-transparent whitespace-nowrap">5. Conclusão</button>
         </div>
 
         <!-- Conteúdo das Abas -->
         <div class="flex-1 overflow-y-auto p-6 space-y-6">
-            <!-- TAB 1: NECESSIDADE -->
+            <!-- TAB 1: IDENTIFICAÇÃO -->
             <div id="mission-tab-1" class="tab-content space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Descrição da Necessidade <span class="text-rose-500">*</span></label>
-                    <textarea id="field-desc" oninput="checkFormCompletion()" placeholder="Descreva o problema a ser resolvido..." 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium text-slate-700 dark:text-slate-200 focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">1. Descrição da Necessidade <span class="text-rose-500">*</span></label>
+                    <textarea id="field-desc" oninput="checkFormCompletion()" placeholder="Qual problema o interesse público precisa resolver?" 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Justificativa <span class="text-rose-500">*</span></label>
-                    <textarea id="field-just" oninput="checkFormCompletion()" placeholder="Por que esta contratação é necessária?" 
-                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium text-slate-700 dark:text-slate-200 focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">2. Previsão no PCA</label>
+                    <textarea placeholder="Está no Plano de Contratações Anual? Se não, justifique." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
                 </div>
             </div>
 
-            <!-- TAB 2: REQUISITOS -->
+            <!-- TAB 2: SOLUÇÃO -->
             <div id="mission-tab-2" class="tab-content hidden space-y-4">
                 <div>
-                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Requisitos da Contratação</label>
-                    <textarea placeholder="Ex: Prazo de entrega, garantia, certificações..." 
-                        class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium text-slate-700 dark:text-slate-200 focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">3. Requisitos da Contratação</label>
+                    <textarea placeholder="O que é essencial para a solução? (Sustentabilidade, etc)" 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">5. Levantamento de Mercado</label>
+                    <textarea placeholder="Alternativas possíveis e justificativa da escolha..." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">7. Descrição da Solução</label>
+                    <textarea placeholder="Descrição completa da solução escolhida..." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
                 </div>
             </div>
 
-            <!-- TAB 3: ESTIMATIVA -->
+            <!-- TAB 3: VALORES -->
             <div id="mission-tab-3" class="tab-content hidden space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Quantidade</label>
-                        <input type="number" placeholder="0" 
-                            class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">Valor Unit.</label>
-                        <input type="text" placeholder="R$ 0,00" 
-                            class="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-bold text-slate-800 dark:text-white focus:border-blue-500 outline-none transition-all">
-                    </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">4. Estimativa de Quantidades</label>
+                    <textarea placeholder="Memória de cálculo e documentos de suporte..." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">6. Estimativa de Preço</label>
+                    <textarea placeholder="Valor unitário referencial e documentos de suporte..." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">8. Justificativa Parcelamento <span class="text-rose-500">*</span></label>
+                    <textarea id="field-parcel" oninput="checkFormCompletion()" placeholder="Por que dividir (ou não) o objeto?" 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
+                </div>
+            </div>
+
+            <!-- TAB 4: RESULTADOS -->
+            <div id="mission-tab-4" class="tab-content hidden space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">9. Resultados Pretendidos</label>
+                    <textarea placeholder="Economicidade, eficácia e melhor aproveitamento..." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">11. Contratações Correlatas</label>
+                    <textarea placeholder="Existem outras contratações interdependentes?" 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">12. Impactos Ambientais</label>
+                    <textarea placeholder="Descrição dos impactos e medidas mitigadoras..." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
+                </div>
+            </div>
+
+            <!-- TAB 5: CONCLUSÃO -->
+            <div id="mission-tab-5" class="tab-content hidden space-y-4">
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">10. Providências Prévias</label>
+                    <textarea placeholder="O que o órgão deve fazer antes de licitar?" 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-24 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2 mb-1 block">13. Viabilidade da Contratação <span class="text-rose-500">*</span></label>
+                    <textarea id="field-viab" oninput="checkFormCompletion()" placeholder="Parecer conclusivo sobre a adequação da contratação..." 
+                        class="mission-input w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-white/5 rounded-2xl p-4 text-sm font-medium focus:border-blue-500 outline-none transition-all h-32 resize-none"></textarea>
                 </div>
             </div>
         </div>
@@ -610,11 +658,14 @@
 
         function checkFormCompletion() {
             const desc = document.getElementById('field-desc').value.trim();
-            const just = document.getElementById('field-just').value.trim();
+            const parcel = document.getElementById('field-parcel').value.trim();
+            const viab = document.getElementById('field-viab').value.trim();
+            
             const btn = document.getElementById('finish-mission-btn');
             const badge = document.getElementById('mission-badge');
             
-            const isComplete = desc.length > 5 && just.length > 5;
+            // Requisito: Pelo menos 5 caracteres em cada campo obrigatório
+            const isComplete = desc.length > 5 && parcel.length > 5 && viab.length > 5;
 
             if (isComplete) {
                 btn.classList.replace('text-slate-200', 'text-emerald-500');
