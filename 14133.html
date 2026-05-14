@@ -60,26 +60,29 @@
             display: block;
         }
 
-        .trail-line {
+        .phase-track {
             position: absolute;
             left: 22px;
-            top: 0;
-            bottom: 0;
+            top: 24px; /* Começa no centro do círculo */
+            bottom: -24px; /* Estende até o início do próximo círculo */
             width: 4px;
-            background: linear-gradient(to bottom, #d1fae5 50%, #dbeafe 50%);
             z-index: 0;
             border-radius: 2px;
         }
 
-        .trail-line-progress {
+        .phase-track-progress {
             position: absolute;
-            left: 22px;
+            left: 0;
             top: 0;
             width: 4px;
-            background: #2563eb;
             z-index: 1;
-            transition: height 0.8s ease-in-out;
             border-radius: 2px;
+            transition: height 0.6s ease-out;
+        }
+
+        /* Ajuste para a última fase não ter linha sobrando */
+        .phase-row:last-child .phase-track {
+            display: none;
         }
 
         /* Anel de Progresso Circular */
@@ -277,12 +280,7 @@
             <h2 id="currentMatchTitle" class="text-xl font-black text-slate-900 mb-8 leading-tight">Carregando...</h2>
 
             <div class="relative pl-0 space-y-12 pb-20">
-                <div class="trail-line"></div>
-                <div id="trailProgress" class="trail-line-progress" style="height: 0%;"></div>
-
-
-
-                <!-- Fase 2: ETP (Dinâmico) -->
+                <!-- Fases dinâmicas injetadas via JS (com trilhas segmentadas) -->
                 <div id="etp-timeline-phase" class="space-y-4">
                     <!-- Cards de missão injetados via JS -->
                 </div>
@@ -700,44 +698,46 @@
             const container = document.getElementById('etp-timeline-phase');
             let html = '';
             
-            const phases = {};
+            const groupedMissions = {};
             missionStatus.forEach(m => {
-                if (!phases[m.phase]) phases[m.phase] = { desc: m.phaseDesc, missions: [] };
-                phases[m.phase].missions.push(m);
+                if (!groupedMissions[m.phase]) groupedMissions[m.phase] = { desc: m.phaseDesc, missions: [] };
+                groupedMissions[m.phase].missions.push(m);
             });
 
-            for (const phaseTitle in phases) {
-                const phase = phases[phaseTitle];
-                const isLocked = phase.missions.every(m => m.status === 'locked');
+            for (const phaseTitle in groupedMissions) {
+                const phase = groupedMissions[phaseTitle];
                 const progress = calculatePhaseProgress(phase.missions);
+                const isLocked = phase.missions.every(m => m.status === 'locked');
                 
-                // Define cor base da fase
-                let phaseColor, bgClass, textClass, badgeClass, btnClass, phaseIcon;
+                // Cores e Ícones específicos por fase
+                let phaseColor, trackColor, bgClass, textClass, badgeClass, btnClass, phaseIcon;
                 if (phaseTitle.includes('Fase 1')) {
-                    phaseColor = '#10b981'; // Emerald
-                    bgClass = 'bg-emerald-500';
-                    textClass = 'text-emerald-600';
+                    phaseColor = '#10b981'; trackColor = '#d1fae5';
+                    bgClass = 'bg-emerald-500'; textClass = 'text-emerald-600';
                     badgeClass = 'bg-emerald-50 text-emerald-600';
                     btnClass = 'bg-emerald-600 shadow-[0_8px_25px_-5px_rgba(16,185,129,0.4)]';
                     phaseIcon = 'fa-file-contract';
                 } else if (phaseTitle.includes('Fase 2')) {
-                    phaseColor = '#2563eb'; // Blue
-                    bgClass = 'bg-blue-600';
-                    textClass = 'text-blue-600';
+                    phaseColor = '#2563eb'; trackColor = '#dbeafe';
+                    bgClass = 'bg-blue-600'; textClass = 'text-blue-600';
                     badgeClass = 'bg-blue-50 text-blue-600';
                     btnClass = 'bg-blue-600 shadow-[0_8px_25px_-5px_rgba(37,99,235,0.4)]';
                     phaseIcon = 'fa-pen-nib';
                 } else {
-                    phaseColor = '#f59e0b'; // Amber
-                    bgClass = 'bg-amber-500';
-                    textClass = 'text-amber-600';
+                    phaseColor = '#f59e0b'; trackColor = '#fef3c7';
+                    bgClass = 'bg-amber-500'; textClass = 'text-amber-600';
                     badgeClass = 'bg-amber-50 text-amber-600';
                     btnClass = 'bg-amber-600 shadow-[0_8px_25px_-5px_rgba(245,158,11,0.4)]';
                     phaseIcon = 'fa-gavel';
                 }
 
                 html += `
-                    <div class="relative flex items-start ${isLocked ? 'opacity-40 grayscale' : ''}">
+                    <div class="phase-row relative flex items-start ${isLocked ? 'opacity-40 grayscale' : ''}">
+                        <!-- LINHA SEGMENTADA (Exclusiva desta fase) -->
+                        <div class="phase-track" style="background-color: ${trackColor};">
+                            <div class="phase-track-progress" style="background-color: ${phaseColor}; height: ${progress}%;"></div>
+                        </div>
+
                         <div class="progress-circle shadow-md shrink-0" style="--percent: ${progress}%; --progress-color: ${phaseColor};">
                             <div class="w-9 h-9 rounded-full ${progress === 100 ? bgClass : (isLocked ? 'bg-slate-200' : bgClass)} text-white flex items-center justify-center z-10 transition-colors duration-500">
                                 <i class="fa-solid ${progress === 100 ? 'fa-check' : (isLocked ? 'fa-lock' : phaseIcon)} text-xs"></i>
@@ -771,7 +771,7 @@
                                 <div class="flex justify-between items-center mb-3">
                                     <div class="flex items-center">
                                         <span class="w-1.5 h-1.5 rounded-full ${bgClass} mr-2 status-pulse"></span>
-                                        <span class="text-[9px] font-black ${textClass.replace('text-', 'text-')} uppercase tracking-widest">${m.title}</span>
+                                        <span class="text-[9px] font-black ${textClass} uppercase tracking-widest">${m.title}</span>
                                     </div>
                                     <span class="text-[8px] font-black ${badgeClass} px-2 py-0.5 rounded-full uppercase">Em Jogo</span>
                                 </div>
@@ -799,28 +799,6 @@
             }
 
             container.innerHTML = html;
-            
-            const completedCount = missionStatus.filter(m => m.status === 'completed').length;
-            const totalCount = missionStatus.length;
-            const totalProgress = (completedCount / totalCount) * 100;
-            
-            const progressLine = document.getElementById('trailProgress');
-            progressLine.style.height = `${totalProgress}%`;
-
-            // Lógica de Gradiente para 3 Fases (DFD: 33.33%, ETP: 66.66%, TR: 100%)
-            if (totalProgress <= 33.33) {
-                progressLine.style.background = '#10b981';
-            } else if (totalProgress <= 66.66) {
-                const stop1 = (33.33 / totalProgress) * 100;
-                progressLine.style.background = `linear-gradient(to bottom, #10b981 ${stop1}%, #2563eb ${stop1}%)`;
-            } else {
-                const stop1 = (33.33 / totalProgress) * 100;
-                const stop2 = (66.66 / totalProgress) * 100;
-                progressLine.style.background = `linear-gradient(to bottom, #10b981 ${stop1}%, #2563eb ${stop1}%, #2563eb ${stop2}%, #f59e0b ${stop2}%)`;
-            }
-
-            // Atualiza a trilha de fundo também
-            document.querySelector('.trail-line').style.background = 'linear-gradient(to bottom, #d1fae5 33.33%, #dbeafe 33.33%, #dbeafe 66.66%, #fef3c7 66.66%)';
         }
 
         function calculatePhaseProgress(missions) {
