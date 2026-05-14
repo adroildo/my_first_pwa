@@ -927,3 +927,85 @@ window.addEventListener('load', () => {
     initSidebarGestures();
     renderPosts();
 });
+
+// Lógica de Quiz Game
+let currentQuestionIndex = 0;
+let quizScore = 0;
+const quizQuestions = [
+    {
+        q: "Qual dessas tecnologias é a base para um PWA?",
+        options: ["Service Workers", "Python", "Swift"],
+        correct: 0
+    },
+    {
+        q: "O que o comando 'git push' faz?",
+        options: ["Baixa o código", "Envia o código", "Deleta o código"],
+        correct: 1
+    },
+    {
+        q: "Qual o foco principal de um design UX?",
+        options: ["Apenas cores", "Experiência do Usuário", "Velocidade do banco"],
+        correct: 1
+    }
+];
+
+function openQuiz() {
+    document.getElementById('quiz-modal').classList.remove('hidden');
+    currentQuestionIndex = 0;
+    quizScore = 0;
+    updateQuizUI();
+    closeQuickMenu();
+}
+
+function closeQuiz() {
+    document.getElementById('quiz-modal').classList.add('hidden');
+}
+
+function updateQuizUI() {
+    const question = quizQuestions[currentQuestionIndex];
+    document.getElementById('quiz-question').innerText = question.q;
+    document.getElementById('quiz-score').innerText = `PONTOS: ${quizScore}`;
+    
+    const progress = ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
+    document.getElementById('quiz-progress').style.width = `${progress}%`;
+
+    const optionsContainer = document.getElementById('quiz-options');
+    optionsContainer.innerHTML = '';
+
+    question.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full p-5 rounded-2xl bg-slate-50 dark:bg-white/5 border-2 border-transparent text-left font-bold text-slate-700 dark:text-slate-200 active:scale-95 transition-all hover:border-indigo-500/30';
+        btn.innerText = opt;
+        btn.onclick = () => handleQuizAnswer(idx, btn);
+        optionsContainer.appendChild(btn);
+    });
+}
+
+function handleQuizAnswer(idx, btn) {
+    const question = quizQuestions[currentQuestionIndex];
+    const allBtns = document.getElementById('quiz-options').querySelectorAll('button');
+    
+    // Desativa todos para evitar cliques múltiplos
+    allBtns.forEach(b => b.disabled = true);
+
+    if (idx === question.correct) {
+        btn.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600');
+        btn.classList.remove('bg-slate-50', 'dark:bg-white/5');
+        quizScore += 100;
+        showAlert('Correto! +100 pontos', 'fa-circle-check');
+    } else {
+        btn.classList.add('bg-rose-500', 'text-white', 'border-rose-600');
+        btn.classList.remove('bg-slate-50', 'dark:bg-white/5');
+        showAlert('Ops! Resposta errada.', 'fa-circle-xmark');
+    }
+
+    setTimeout(() => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizQuestions.length) {
+            updateQuizUI();
+        } else {
+            showAlert(`Quiz Finalizado! Score: ${quizScore}`, 'fa-trophy');
+            closeQuiz();
+        }
+    }, 1500);
+}
