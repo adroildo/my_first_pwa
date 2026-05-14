@@ -98,10 +98,16 @@ function initBottomSheetGestures(sheet, closeFn) {
     });
 }
 
-// Inicializa gestos nos dois modais
+// Inicializa gestos nos modais
 window.addEventListener('load', () => {
     initBottomSheetGestures(bottomSheetEdit, closeEditModal);
     initBottomSheetGestures(bottomSheetQuick, closeQuickMenu);
+    
+    const mapModal = document.getElementById('map-modal');
+    if (mapModal) {
+        const mapSheet = mapModal.querySelector('.bottom-sheet');
+        initBottomSheetGestures(mapSheet, closeMapModal);
+    }
 });
 
 function toggleMoreOptions(showMore) {
@@ -366,7 +372,10 @@ function closeMapModal() {
     const sheet = modal.querySelector('.bottom-sheet');
     
     sheet.classList.remove('active');
-    setTimeout(() => modal.classList.add('hidden'), 300);
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        sheet.style.transform = ''; // Reset do arraste
+    }, 300);
 }
 
 function clearCheckInHistory() {
