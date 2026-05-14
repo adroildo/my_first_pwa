@@ -167,9 +167,9 @@ body {
 }
 
 .sidebar {
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    width: 280px;
-    max-width: 80%;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+    max-width: 100%;
     z-index: 150;
     background-color: var(--nav-bg);
 }
