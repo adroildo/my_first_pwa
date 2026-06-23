@@ -3,7 +3,7 @@
   "short_name": "AppPremium",
   "start_url": "index.html",
   "display": "fullscreen",
-  "background_color": "#f8fafc",
+  "background_color": "#c9182d",
   "theme_color": "#6366f1",
   "icons": [
     {
